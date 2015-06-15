@@ -34,6 +34,8 @@ int delay = 0;
 int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
 int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
 
+int counter = 0;
+
 void setup() {
   
   size(displaySize, displaySize);
@@ -54,16 +56,19 @@ void setup() {
   bpm.setup();
   field = new Field(500);
   
-  drawHexes();
-  
+  //drawHexes();
 }
 
 void draw() {
   
   //field.randomize();
-  //field.update();
-  //field.draw();
+  field.update();
+  field.draw();
   
+}
+
+void keyPressed() {
+  field.setMode((field.mode + 1) % field.nModes);
 }
 
 void drawHexes() {
@@ -285,4 +290,53 @@ int[] hexToXY(int i0, int i1) {
   int x = round(((4 - abs(y - 4)) * (displaySize / 54) + newXY[0]) / (displaySize / 27));
   
   return new int[] {x, y};
+}
+
+int hexToI(int i0, int i1) {
+  
+  int[] xy = hexToXY(i0, i1);
+  return xyToI(xy[0], xy[1]);
+  
+}
+
+int ringToI(int ringRadius, int ringIndex) {
+  
+  int x = 4;
+  int y = 4;
+  
+  if (ringRadius == 0) return xyToI(x, y);
+  
+  int side = ringIndex / ringRadius;
+  int sideStart = side * ringRadius;
+  int sideIndex = ringIndex - sideStart;
+  switch(side) {
+    case 0:
+      x += sideIndex - ringRadius;
+      y -= ringRadius;
+      break;
+    case 1:
+      y += sideIndex - ringRadius;
+      x += sideIndex;
+      break;
+    case 2:
+      y += sideIndex;
+      x += ringRadius - sideIndex;
+      break;
+    case 3:
+      x -= sideIndex;
+      y += ringRadius;
+      break;
+    case 4:
+      x -= ringRadius;
+      y += (ringRadius - sideIndex);
+      break;
+    case 5:
+      x -= ringRadius;
+      y -= sideIndex;
+      break;
+  }
+  
+  int i = xyToI(x,y);
+  return i;
+  
 }

@@ -5,9 +5,9 @@ class Field {
   int nPanels, chance;
   int modeChance = 5000;
   float faderModeChance = 0.02;
-  Mode[] modes = new Mode[1];
+  Mode[] modes = new Mode[3];
   int nModes;
-  int mode = 0;
+  int mode = 2;
   
   Field(int chanceFactor) {
     
@@ -21,6 +21,8 @@ class Field {
     
     chance = chanceFactor;
     modes[0] = new FFTByPixel(panels, wheel, 0.98, chance);
+    modes[1] = new FFTByPanel(panels, wheel, 0.8, chance);
+    modes[2] = new Hypnotize(panels, wheel, 0.98, chance);
     
   }
   
@@ -37,9 +39,9 @@ class Field {
   }
   
   public void randomize() {
-    if (rand.nextInt(modeChance) == 0 && modeSwitching) {
-      setMode(rand.nextInt(nModes));
-    }
+    //if (rand.nextInt(modeChance) == 0 && modeSwitching) {
+    //  setMode(rand.nextInt(nModes));
+    //}
   }
   
   public void newScheme() {

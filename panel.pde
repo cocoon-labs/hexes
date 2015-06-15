@@ -42,6 +42,9 @@ class Panel {
         pushMatrix();
         hexagon(0, 0, radius, false);
         popMatrix();
+        /*fill(255);
+        textSize(radius);
+        text("" + n, -radius/2 - 10, radius/2 - 10);*/
         translate(2 * radius, 0);
       }
       popMatrix();
@@ -62,6 +65,23 @@ class Panel {
   
   public void updateOne(int[] c, int index) {
     colors[index] = c;
+  }
+  
+  public void updateOneByHex(int[] c, int j, int k) {
+    int[] newC = new int[] {c[0], c[1], c[2]};
+    colors[hexToI(j, k)] = newC;
+  }
+  
+  public void updateSmallHex(int[] c, int j) {
+    int[] newC = new int[] {c[0], c[1], c[2]};
+    for (int k = 0; k < 7; k++) {
+      updateOneByHex(newC, j, k);
+    }
+  }
+  
+  public void updateByRingIndex(int[] c, int ring, int index) {
+    int[] newC = new int[] {c[0], c[1], c[2]};
+    colors[ringToI(ring, index)] = newC;
   }
 
   public void updateRowCol(int[] c, int row, int col) {
@@ -147,8 +167,50 @@ class Panel {
     }
   }
   
+  public void updateRing(int[] c, int radius) {
+    radius = radius % 5;
+    
+    for (int i = 0; i < max(1, radius * 6); i++) {
+      updateOne(new int[] {c[0], c[1], c[2]}, ringToI(radius, i));
+    }
+  }
+  
+  public void fadeRing(float fadeFactor, int radius) {
+    radius = radius % 5;
+    
+    for (int i = 0; i < max(1, radius * 6); i++) {
+      int pixI = ringToI(radius, i);
+      fadeOne(fadeFactor, pixI);
+    }
+  }
+  
+  public int[] getRing(int radius) {
+    radius = radius % 5;
+    int[] c = new int[] {0, 0, 0};
+    int n = max(1, radius * 6);
+    for (int i = 0; i < n; i++) {
+      int[] ci = colors[ringToI(radius, i)];
+      c[0] += ci[0];
+      c[1] += ci[1];
+      c[2] += ci[2];
+    }
+    c[0] /= n;
+    c[1] /= n;
+    c[2] /= n;
+    
+    return c;
+  }
+  
   public int[] getOne(int index) {
     return colors[index];
+  }
+  
+  public int[] getOneByHex(int j, int k) {
+    return colors[hexToI(j, k)];
+  }
+  
+  public int[] getOneByRingIndex(int ring, int index) {
+    return colors[ringToI(ring, index)];
   }
   
   void fadeAll(float factor) {
