@@ -31,6 +31,9 @@ float intraloopWSF = 1.0; // WSF = wheel step factor
 float interloopWSF = 1.0; // WSF = wheel step factor
 int delay = 0;
 
+int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
+int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
+
 void setup() {
   
   size(displaySize, displaySize);
@@ -41,32 +44,24 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  //in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  //bpm = new BPMDetector(in);
+  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  bpm = new BPMDetector(in);
   
   // MP3 in
-  sound = minim.loadFile(song);
-  bpm = new BPMDetector(sound);
+  //sound = minim.loadFile(song);
+  //bpm = new BPMDetector(sound);
   
   bpm.setup();
   field = new Field(500);
   
-  //drawHexes();
+  drawHexes();
 }
 
 void draw() {
   
-  field.randomize();
-  field.update();
-  field.draw();
-  
-}
-
-void keyPressed() {
-  
-  int[] c = new int[] {255, 0, 0};
-  drawHex(0, iHex, c);
-  iHex = (iHex + 1) % 61;
+  //field.randomize();
+  //field.update();
+  //field.draw();
   
 }
 
@@ -110,9 +105,6 @@ void drawHexFill(float x, float y, float radius, int depth) {
   }
   
 }
-
-int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
-int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
 
 void drawHexes(float x, float y) {
   
@@ -230,6 +222,23 @@ float[] polar2cart(float r, float theta, float xOff, float yOff) {
   
 }
 
+float[] cart2polar(float x, float y, float xOff, float yOff) {
+  
+  x -= xOff;
+  y -= yOff;
+  if (x == 0 && y == 0) return new float[] {0.0, 0.0};
+  float r = sqrt(sq(x) + sq(y));
+  float theta = atan(y / x);
+  if (x < 0) {
+    theta += PI;
+  } else if (y < 0) {
+    theta += TWO_PI;
+  }
+  
+  return new float[] {r, theta};
+  
+}
+
 
 int[] iToXY(int n) {
   
@@ -244,4 +253,35 @@ int[] iToXY(int n) {
   
   return new int[] {x, row};
   
+}
+
+int xyToN(int x, int y) {
+  
+  
+  
+}
+
+int[] hexToXY(int i0, int i1) {
+  
+  float[] center = new float[] {0.0, 0.0};
+  float radius = displaySize / 54;
+  float delta = 2 * radius * sin(PI / 3);
+  
+  i0 = i0 % 7;
+  i1 = i1 % 7;
+  
+  if (i0 != 0) {
+    center = polar2cart(displaySize / 9, (2 * i0 - 5) * TWO_PI / 12, 0, 0);
+  }
+  if (i1 != 0) {
+    center = polar2cart(displaySize / 27, (2 * i1 - 5) * TWO_PI / 12, center[0], center[1]);
+  }
+  
+  float[] rt = cart2polar(center[0], -center[1], 0, 0);
+  float[] newXY = polar2cart(rt[0], rt[1] + PI / 6, 4 * radius, 0);
+  newXY[1] = 4 * delta - newXY[1];
+  int y = round(newXY[1] / delta);
+  int x = round(((4 - abs(y - 4)) * (displaySize / 54) + newXY[0]) / (displaySize / 27));
+  
+  return new int[] {x, y};
 }
