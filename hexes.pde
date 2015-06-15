@@ -55,6 +55,7 @@ void setup() {
   field = new Field(500);
   
   drawHexes();
+  
 }
 
 void draw() {
@@ -255,9 +256,9 @@ int[] iToXY(int n) {
   
 }
 
-int xyToN(int x, int y) {
+int xyToI(int x, int y) {
   
-  
+  return rowStarts[y % 9] + x;
   
 }
 
