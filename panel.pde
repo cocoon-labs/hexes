@@ -7,6 +7,7 @@ class Panel {
   ColorWheel wheel;
   int index;
   float[] center;
+  int nStrips = rowStarts.length;
   
   Panel(int index, ColorWheel wheel) {
     
@@ -62,6 +63,89 @@ class Panel {
   public void updateOne(int[] c, int index) {
     colors[index] = c;
   }
+
+  public void updateRowCol(int[] c, int row, int col) {
+    int pixIdx = 0;
+    row = row % nStrips;
+    col = col % rowLen(row);
+    for (int i = 0; i < row; i++) {
+      pixIdx += rowLen(i);
+    }
+    pixIdx += col;
+    colors[pixIdx] = c;
+  }
+
+  public void updateStrip(int[] c, int row, boolean flip) {
+    if (!flip) {
+      updateStripNoFlip(c, row);
+    } else {
+      updateStripFlip(c, row);
+    }
+  }
+  
+  public void updateStripNoFlip(int[] c, int row) {
+    row = row % nStrips;
+    int rowStart = rowStarts[row];
+    int rowEnd = rowStart + rowLen(row);
+    for (int i = rowStart; i < rowEnd; i++) {
+      colors[i] = c;
+    }
+  }
+  
+  public void updateStripFlip(int[]c, int row) {
+    int centerRow = nStrips / 2;
+    int centerCol = rowLen(centerRow) / 2;
+    if (row <= nStrips / 2) {
+      for (int i = 0; i <= nStrips / 2; i++) {
+        updateRowCol(c, centerRow - i, row);
+      }
+      for (int i = nStrips / 2 + 1; i <= nStrips / 2 + row; i++) {
+        updateRowCol(c, i, rowLen(row) - i - 1);
+      }
+    } else {
+      for (int i = row - nStrips / 2 ; i <= nStrips / 2; i++) {
+        updateRowCol(c, i, row);
+      }
+      for (int i = nStrips / 2 + 1; i < nStrips; i++) {
+        updateRowCol(c, i, rowLen(i) - (nStrips - row));
+      }
+    }
+      
+  }
+
+  public void updateSide(int[] c, int side) {
+    switch(side) {
+    case(0) : // Top right
+      updateStrip(c, 0, false);
+      break;
+    case(1) : // Right
+      for (int i = 0; i <= nStrips / 2; i++) {
+        updateOne(c, rowEnds[i]);
+      }
+      break;
+    case(2) : // Bottom Right
+      for (int i = nStrips / 2; i < nStrips; i++) {
+        updateStrip(c, nStrips - 1, true);
+      }
+      break;
+    case(3) : // Bottom Left
+      updateStrip(c, nStrips - 1, false);
+      break;
+    case(4) : // Left
+      for (int i = nStrips / 2; i < nStrips; i++) {
+        updateOne(c, rowStarts[i]);
+      }
+      break;
+    case(5) : // Top Left
+      updateStrip(c, 0, true);
+    }
+  }
+
+  public void updateEdge(int[] c) {
+    for (int i = 0; i < 6; i++) {
+      updateSide(c, i);
+    }
+  }
   
   public int[] getOne(int index) {
     return colors[index];
@@ -109,6 +193,10 @@ class Panel {
   
   public int getPixelAmp(int i) {
     return (colors[i][0] + colors[i][1] + colors[i][2]) / 3;
+  }
+
+  private int rowLen(int r) {
+    return rowEnds[r] - rowStarts[r] + 1;
   }
   
 }
