@@ -113,12 +113,9 @@ class ColorWheel {
 
   public void setScheme(int schemeN) {
     if (schemeN < nSchemes()) {
-      println("changing scheme");
-      println(scheme[0][0]);
       scheme[0] = schemes[schemeN][0];
       scheme[1] = schemes[schemeN][1];
       scheme[2] = schemes[schemeN][2];
-      println(scheme[0][0]);
     }
   }
 

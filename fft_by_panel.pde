@@ -8,6 +8,7 @@ public class FFTByPanel extends Mode {
   FFTByPanel(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
     assignBands();
+    delayable = true;
   }
 
   public void update() {
@@ -25,7 +26,7 @@ public class FFTByPanel extends Mode {
       int[] c = panels[p].getOneByRingIndex(0, 0);
       shiftOutOne(c, p, true);
     }
-    wheel.turn(1);
+    wheel.turn((int) intraloopWSF);
   }
   
   public void onBeat() {

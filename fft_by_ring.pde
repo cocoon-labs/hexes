@@ -1,11 +1,12 @@
-public class FFTByPixel extends Mode {
+public class FFTByRing extends Mode {
   
-  int freqThresh = 80;
-  int ampFactor = 20;
+  int freqThresh = 120;
+  int ampFactor = 100;
   int beatOffset = 11;
+  int panelOffset = 10;
   boolean isShifting = true;
 
-  FFTByPixel(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
+  FFTByRing(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
     highChance = 1;
     delayable = true;
@@ -14,13 +15,25 @@ public class FFTByPixel extends Mode {
   public void update() {
     fadeAll(fadeFactor);
     super.update();
-    for (int i = 0; i < nPixels; i++) {
-      int iAmp = constrain(getPixelBand(i) * ampFactor, 0, 255);
-      float pixelStep = 256.0 / nPixels;
-      if (iAmp < freqThresh) fadeOne(fadeFactor, i);
-      else updateByIndex(wheel.getColor((int) ((int) (pixelStep * intraloopWSF) * i), iAmp), i);
+    
+    int rAmp = constrain(getRingBand(0) * ampFactor, 0, 255);
+    float pixelStep = 256.0 / 61;
+    
+    for (int p = 0; p < nPanels; p++) {
+      for (int r = 0; r < 5; r++) {
+        rAmp = constrain(getRingBand(r) * ampFactor, 0, 255);
+        for (int i = 0; i < max(1, r * 6); i++) {
+          int n = ringToI(r, i);
+          println(n);
+          if (rAmp < freqThresh) fadeRing(fadeFactor, r);
+          else {
+            int[] c = wheel.getColor((int) ((int) (pixelStep * intraloopWSF) * n) + (p * (int) (panelOffset * interloopWSF)), rAmp);
+            panels[p].updateOneByAverage(new int[] {c[0], c[1], c[2]}, n, fadeFactor * 3 / 4);
+          }
+        }
+      }
     }
-    if (isShifting) {
+    if (/*isShifting*/ false) {
       shift(shiftDir);
     }
     wheel.turn((int) intraloopWSF);
@@ -46,11 +59,12 @@ public class FFTByPixel extends Mode {
     }
     if (rand.nextInt(highChance) == 0) {
       shiftStyle = rand.nextInt(nShiftStyles);
+      
     }
   }
   
-  public int getPixelBand(int pixelIndex) {
-    float indexMap = map(pixelIndex, 0, nPixels - 1, 0, 29);
+  public int getRingBand(int ring) {
+    float indexMap = map(ring, 0, 4, 0, 29);
     int lowBandIndex = (int) indexMap;
     float decimal = indexMap - lowBandIndex;
     if (decimal == 0.0) return (int) bpm.getDetailBand(lowBandIndex);

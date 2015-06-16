@@ -10,6 +10,8 @@ class Mode {
   boolean delayable = false;
   int shiftStyle = 0;
   int nShiftStyles = 3;
+  boolean shiftDir = true;
+  int highChance = 8;
   
   Mode(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     this.panels = panels;
@@ -62,6 +64,12 @@ class Mode {
     panels[index / 61].updateOne(c, index % 61);
   }
   
+  public void updateRing(int[] c, int r) {
+    for (int i = 0; i < nPanels; i++) {
+      panels[i].updateRing(c, r);
+    }
+  }
+  
   public void refreshColors() {
     for (int i = 0; i < nPanels; i++) {
       panels[i].refreshColors();
@@ -98,6 +106,12 @@ class Mode {
       for (int j = 0; j < 7; j++) {
         rotateSmallHex(i, j, clockwise);
       }
+    }
+  }
+  
+  public void fadeRing(float fadeFactor, int radius) {
+    for (int i = 0; i < nPanels; i++) {
+      panels[i].fadeRing(fadeFactor, radius);
     }
   }
   

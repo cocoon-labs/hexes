@@ -67,6 +67,10 @@ class Panel {
     colors[index] = c;
   }
   
+  public void updateOneByAverage(int[] c, int index, float factor) {
+    colors[index] = averageColor( new int[] {c[0], c[1], c[2]} , colors[index], factor);
+  }
+  
   public void updateOneByHex(int[] c, int j, int k) {
     int[] newC = new int[] {c[0], c[1], c[2]};
     colors[hexToI(j, k)] = newC;
@@ -173,6 +177,23 @@ class Panel {
     for (int i = 0; i < max(1, radius * 6); i++) {
       updateOne(new int[] {c[0], c[1], c[2]}, ringToI(radius, i));
     }
+  }
+  
+  public void updateRingByAverage(int[] c, int radius, float factor) {
+    radius = radius % 5;
+    
+    for (int i = 0; i < max(1, radius * 6); i++) {
+      int pixelIndex = ringToI(radius, i);
+      updateOne( averageColor( new int[] {c[0], c[1], c[2]} , colors[pixelIndex], factor) , pixelIndex);
+    }
+  }
+  
+  public int[] averageColor(int[] c0, int[] c1, float factor) {
+    int[] averageC = new int[3];
+    for (int i = 0; i < 3; i++) {
+      averageC[i] = (int) ((c0[i] * factor + c1[i] * (1.0 - factor)) / 2);
+    }
+    return averageC;
   }
   
   public void fadeRing(float fadeFactor, int radius) {
