@@ -8,6 +8,7 @@ class Panel {
   int index;
   float[] center;
   int nStrips = rowStarts.length;
+  int DOWNDIAG = 0, UPDIAG = 1, VERTICAL = 2;
   
   Panel(int index, ColorWheel wheel) {
     
@@ -99,75 +100,45 @@ class Panel {
     colors[pixIdx] = c;
   }
 
-  public void updateStrip(int[] c, int row, boolean flip) {
-    if (!flip) {
-      updateStripNoFlip(c, row);
-    } else {
-      updateStripFlip(c, row);
-    }
-  }
-  
-  public void updateStripNoFlip(int[] c, int row) {
+  public int rowColToI(int row, int col) {
     row = row % nStrips;
-    int rowStart = rowStarts[row];
-    int rowEnd = rowStart + rowLen(row);
-    for (int i = rowStart; i < rowEnd; i++) {
-      colors[i] = c;
-    }
+    col = col % rowLen(row);
+    return rowStarts[row] + col;
+  }    
+
+  // add pixel offset to strip update
+  public void updateStrip(int[] c, int row, boolean flip) {
+      updateStrip(c, row, flip, 0, rowLen(row) - 1);
   }
-  
-  public void updateStripFlip(int[]c, int row) {
-    int centerRow = nStrips / 2;
-    int centerCol = rowLen(centerRow) / 2;
-    if (row <= nStrips / 2) {
-      for (int i = 0; i <= nStrips / 2; i++) {
-        updateRowCol(c, centerRow - i, row);
+
+  public void updateStrip(int[] c, int row, boolean flip, int beg, int end) {
+    if (!flip) {
+      row = row % nStrips;
+      int rowStart = rowStarts[row];
+      int rowEnd = rowStart + rowLen(row);
+      for (int i = rowStart + beg; i <= rowStart + end; i++) {
+        colors[i] = c;
       }
-      for (int i = nStrips / 2 + 1; i <= nStrips / 2 + row; i++) {
-        updateRowCol(c, i, rowLen(row) - i - 1);
-      }
+
+      // updateStripNoFlip(c, row, beg, end);
     } else {
-      for (int i = row - nStrips / 2 ; i <= nStrips / 2; i++) {
-        updateRowCol(c, i, row);
+      int centerRow = nStrips / 2;
+      int centerCol = rowLen(centerRow) / 2;
+      if (row <= nStrips / 2) {
+        for (int i = 0; i <= nStrips / 2 - (rowLen(row) - end) + 1; i++) {
+          updateRowCol(c, centerRow - i, row);
+        }
+        for (int i = nStrips / 2 + 1; i <= nStrips / 2 + row - beg; i++) {
+          updateRowCol(c, i, rowLen(row) - i - 1);
+        }
+      } else {
+        for (int i = row - nStrips / 2 + (rowLen(row) - end) - 1; i <= nStrips / 2; i++) {
+          updateRowCol(c, i, row);
+        }
+        for (int i = nStrips / 2 + 1; i < nStrips - beg; i++) {
+          updateRowCol(c, i, rowLen(i) - (nStrips - row));
+        }
       }
-      for (int i = nStrips / 2 + 1; i < nStrips; i++) {
-        updateRowCol(c, i, rowLen(i) - (nStrips - row));
-      }
-    }
-      
-  }
-
-  public void updateSide(int[] c, int side) {
-    switch(side) {
-    case(0) : // Top right
-      updateStrip(c, 0, false);
-      break;
-    case(1) : // Right
-      for (int i = 0; i <= nStrips / 2; i++) {
-        updateOne(c, rowEnds[i]);
-      }
-      break;
-    case(2) : // Bottom Right
-      for (int i = nStrips / 2; i < nStrips; i++) {
-        updateStrip(c, nStrips - 1, true);
-      }
-      break;
-    case(3) : // Bottom Left
-      updateStrip(c, nStrips - 1, false);
-      break;
-    case(4) : // Left
-      for (int i = nStrips / 2; i < nStrips; i++) {
-        updateOne(c, rowStarts[i]);
-      }
-      break;
-    case(5) : // Top Left
-      updateStrip(c, 0, true);
-    }
-  }
-
-  public void updateEdge(int[] c) {
-    for (int i = 0; i < 6; i++) {
-      updateSide(c, i);
     }
   }
   
@@ -225,6 +196,17 @@ class Panel {
   public int[] getOne(int index) {
     return colors[index];
   }
+
+  public int[] getOneRowCol(int row, int col) {
+    int pixIdx = 0;
+    row = (row + nStrips) % nStrips;
+    col = (col + rowLen(row)) % rowLen(row);
+    for (int i = 0; i < row; i++) {
+      pixIdx += rowLen(i);
+    }
+    pixIdx += col;
+    return colors[pixIdx];
+  }
   
   public int[] getOneByHex(int j, int k) {
     return colors[hexToI(j, k)];
@@ -232,6 +214,10 @@ class Panel {
   
   public int[] getOneByRingIndex(int ring, int index) {
     return colors[ringToI(ring, index)];
+  }
+
+  public int[] getOneByTriangleIndex(int tri, int index) {
+    return colors[triangleToI(tri, index)];
   }
   
   void fadeAll(float factor) {
@@ -279,7 +265,105 @@ class Panel {
   }
 
   private int rowLen(int r) {
+    r = (r + nStrips) % nStrips;
     return rowEnds[r] - rowStarts[r] + 1;
   }
-  
+
+  private int triangleToI(int tri, int index) {
+    tri = tri % 6;
+    index = index % 15;
+
+    int result = 0;
+    int center = nStrips / 2;
+    int indexFactor = (tri == 0 || tri == 4 || tri == 5) ? -1 : 1;
+    int side = index / center;
+    int initOrient = (VERTICAL + 2 * tri); 
+    int orient = (initOrient + side) % 3;
+    int[] factors = {};
+    int[] innerFactors = {};
+
+    index = index - side * center;
+
+    switch(tri) {
+    case (0):
+      factors = new int[] {-index, 0, index, rowLen(center) - index - 1};
+      innerFactors = new int[] {1, 2 - index, 1, 3};
+      break;
+    case (1):
+      factors = new int[] {index, nStrips-1, index, rowLen(center) - index - 1};
+      innerFactors = new int[] {1, rowLen(center+1) - 3 + index, nStrips - 2, 3};
+      break;
+    case (2):
+      factors = new int[] {index, nStrips-1, rowLen(nStrips-1) - index - 1, rowLen(center) - index - 1};
+      innerFactors = new int[] {1, rowLen(center+1) - 3 + index, nStrips - 2, 2};
+      break;
+    case (3):
+      factors = new int[] {index, nStrips-1, rowLen(nStrips-1) - index - 1, index};
+      innerFactors = new int[] {-1, rowLen(center-1) - 3 + index, nStrips - 2, 2};
+      break;
+    case (4):
+      factors = new int[] {-index, 0, rowLen(0) - index - 1, index};
+      innerFactors = new int[] {-1, 2 - index, 1, 2};
+      break;
+    case (5):
+      factors = new int[] {-index, 0, index, index};
+      innerFactors = new int[] {-1, 2 - index, 1, 3};
+      break;
+    }
+
+    if (side == 0) {
+      result = lineToI(center, center + factors[0], orient);
+    } else if (side == 1) {
+      result = lineToI(factors[1], factors[2], orient); 
+    } else if (side == 2) {
+      result = lineToI(center, factors[3], orient);
+    } else if (side == 3) {
+      if (index < 2) {
+        result = lineToI(center + innerFactors[0], innerFactors[1], orient);
+      } else {
+        result = lineToI(innerFactors[2], innerFactors[3], (orient + 1) % 3);
+      }
+    }
+
+    return result;
+  }
+
+  private int lineToI(int lin, int index, int orientation) {
+    int result = 0;
+    int centerLin = nStrips / 2;
+    lin = lin % nStrips;
+    index = index % rowLen(lin);
+    if (orientation == DOWNDIAG) {
+      result = rowColToI(lin, index);
+    } else if (orientation == UPDIAG) {
+      if (lin <= centerLin) {
+        if (index <= lin) {
+          result = rowColToI(centerLin + lin - index, index);
+        } else {
+          result = rowColToI(centerLin + lin - index, lin);
+        }
+      } else {
+        if (index <= centerLin) {
+          result = rowColToI(nStrips - index - 1, index + lin - centerLin);
+        } else {
+          result = rowColToI(nStrips - index - 1, lin);
+        }
+      }
+    } else if (orientation == VERTICAL) {
+      if (lin <= centerLin) {
+        if (index < lin) {
+          result = rowColToI(centerLin - lin + index, index);
+        } else {
+          result = rowColToI(centerLin  - lin + index, lin);
+        }
+      } else {
+        if (index <= centerLin) {
+          result = rowColToI(index, index + lin - centerLin);
+        } else {
+          result = rowColToI(index, lin);
+        }
+      }
+    }
+    return result;
+  }
 }

@@ -9,7 +9,13 @@ import netP5.*;
 
 Random rand = new Random();
 
-int displaySize = 2500;
+/* TODO:
+new OSC controls: 
+global fade factor 
+global audio threshold factor and amplitude multiplier (maybe xy)
+ */
+
+int displaySize = 800;
 int iHex = 0;
 Field field;
 
@@ -20,7 +26,7 @@ AudioPlayer sound;
 AudioInput in;
 int bufferSize = 1024;
 float sampleRate = 44100;
-String song = "dlp.mp3";
+String song = "ohl.mp3";
 
 // remote stuff
 int globalBrightness = 255;
@@ -29,7 +35,7 @@ int modeC = 2;
 boolean houseLightsOn = false;
 float intraloopWSF = 1.0; // WSF = wheel step factor
 float interloopWSF = 1.0; // WSF = wheel step factor
-int delay = 0;
+int delay = 100;
 
 int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
 int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
@@ -51,12 +57,12 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  bpm = new BPMDetector(in);
+  // in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  // bpm = new BPMDetector(in);
   
   // MP3 in
-  //sound = minim.loadFile(song);
-  //bpm = new BPMDetector(sound);
+  sound = minim.loadFile(song);
+  bpm = new BPMDetector(sound);
   
   bpm.setup();
   field = new Field(500, 80);
@@ -66,15 +72,13 @@ void setup() {
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.1.149", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.1.253", myListeningPort);
 }
 
 void draw() {
-  
   field.randomize();
   field.update();
   field.draw();
-  
 }
 
 void keyPressed() {
@@ -249,8 +253,9 @@ private void oscConnect(String theIPaddress) {
 
 void drawHexes() {
   
-  strokeWeight(5);
-  stroke(255);
+  strokeWeight(1);
+  stroke(0);
+  // noStroke();
   //fill(0);
   noFill();
   float hexRad = displaySize / 6;

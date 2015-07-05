@@ -6,9 +6,9 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  Mode[] modes = new Mode[5];
+  Mode[] modes = new Mode[6];
   int nModes;
-  int mode = 0;
+  int mode = 5;
   
   Field(int chanceFactor, int modeChance) {
     
@@ -27,6 +27,7 @@ class Field {
     modes[2] = new FFTByPixel(panels, wheel, 0.98, chance);
     modes[3] = new FFTByRandomPixel(panels, wheel, 0.99, chance);
     modes[4] = new Hypnotize(panels, wheel, 0.98, chance);
+    modes[5] = new Ninja(panels, wheel, 0.93, chance);
     
   }
   

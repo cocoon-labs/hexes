@@ -196,5 +196,27 @@ class Mode {
         break;
     }
   }
+
+  public void updateTriangleByIndex(int[] c, int panel, int tri, int index) {
+    panels[panel].updateOne(c, panels[panel].triangleToI(tri, index));
+  }
+
+  public void updateInnerTriangles(int[] c) {
+    for (int i = 0; i < nPanels; i++) {
+      updateInnerTrianglesByPanel(c, i);
+    }
+  }
+  
+  public void updateInnerTrianglesByPanel(int[] c, int pIdx) {
+    for (int i = 0; i < 6; i++) {
+      updateOneInnerTriangle(c, pIdx, i);
+    }
+  }
+
+  public void updateOneInnerTriangle(int[] c, int pIdx, int tri) {
+    for (int j = 12; j < 15; j++) {
+      updateTriangleByIndex(c, pIdx, tri, j);
+    }
+  }
   
 }
