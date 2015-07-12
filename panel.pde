@@ -9,13 +9,15 @@ class Panel {
   float[] center;
   int nStrips = rowStarts.length;
   int DOWNDIAG = 0, UPDIAG = 1, VERTICAL = 2;
+  OPC opc;
   
-  Panel(int index, ColorWheel wheel) {
+  Panel(int index, OPC opc, ColorWheel wheel) {
     
     colors = new int[nPixels][3];
     this.index = index;
     this.wheel = wheel;
     this.center = panelCenter(index);
+    this.opc = opc;
     
     for (int i = 0; i < nPixels; i++) {
       for (int j = 0; j < 3; j++) {
@@ -56,6 +58,13 @@ class Panel {
     
     popMatrix();
     
+  }
+
+  public void ship(int idxOffset) {
+    for (int i = 0; i < nPixels; i++) {
+      opc.setPixel(idxOffset + i, colors[i][0] << 16 | colors[i][1] << 8 | colors[i][2]);
+    }
+    opc.writePixels();
   }
   
   public void updateAll(int[] c) {

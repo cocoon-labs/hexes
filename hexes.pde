@@ -18,6 +18,7 @@ global audio threshold factor and amplitude multiplier (maybe xy)
 int displaySize = 800;
 int iHex = 0;
 Field field;
+OPC opc;
 
 // audio crap
 BPMDetector bpm;
@@ -26,7 +27,7 @@ AudioPlayer sound;
 AudioInput in;
 int bufferSize = 1024;
 float sampleRate = 44100;
-String song = "ohl.mp3";
+String song = "dlp.mp3";
 
 // remote stuff
 int globalBrightness = 255;
@@ -65,9 +66,12 @@ void setup() {
   bpm = new BPMDetector(sound);
   
   bpm.setup();
-  field = new Field(500, 80);
+  // field = new Field(500, 80);
   
   //drawHexes();
+
+  opc = new OPC(this, "127.0.0.1", 7890);
+  field = new Field(500, 80, opc);
   
   oscP5 = new OscP5(this, myListeningPort);
  
@@ -78,7 +82,8 @@ void setup() {
 void draw() {
   field.randomize();
   field.update();
-  field.draw();
+  // field.draw();
+  field.send();
 }
 
 void keyPressed() {

@@ -9,15 +9,17 @@ class Field {
   Mode[] modes = new Mode[6];
   int nModes;
   int mode = 5;
+  OPC opc;
   
-  Field(int chanceFactor, int modeChance) {
+  Field(int chanceFactor, int modeChance, OPC opc) {
     
+    this.opc = opc;
     nPanels = 7;
     nModes = modes.length;
     panels = new Panel[nPanels];
     wheel = new ColorWheel();
     for (int i = 0; i < nPanels; i++) {
-      panels[i] = new Panel(i, wheel);
+      panels[i] = new Panel(i, opc, wheel);
     }
     
     chance = chanceFactor;
@@ -37,6 +39,12 @@ class Field {
       panels[i].draw();
     }
     
+  }
+
+  void send() {
+    for (int i = 0; i < nPanels; i++) {
+      panels[i].ship(i * panels[0].nPixels);
+  }
   }
   
   public void update() {
