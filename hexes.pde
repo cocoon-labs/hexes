@@ -15,7 +15,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 800;
+int displaySize = 2000;
 int iHex = 0;
 Field field;
 OPC opc;
@@ -36,7 +36,7 @@ int modeC = 2;
 boolean houseLightsOn = false;
 float intraloopWSF = 1.0; // WSF = wheel step factor
 float interloopWSF = 1.0; // WSF = wheel step factor
-int delay = 100;
+int delay = 0;
 
 int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
 int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
@@ -58,15 +58,14 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  // in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  // bpm = new BPMDetector(in);
+  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  bpm = new BPMDetector(in);
   
   // MP3 in
-  sound = minim.loadFile(song);
-  bpm = new BPMDetector(sound);
+  //sound = minim.loadFile(song);
+  //bpm = new BPMDetector(sound);
   
   bpm.setup();
-  // field = new Field(500, 80);
   
   //drawHexes();
 
@@ -76,14 +75,14 @@ void setup() {
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.1.253", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.1.150", myListeningPort);
 }
 
 void draw() {
   field.randomize();
   field.update();
-  // field.draw();
-  field.send();
+  field.draw();
+  //field.send();
 }
 
 void keyPressed() {
@@ -525,4 +524,80 @@ int ringToI(int ringRadius, int ringIndex) {
   int i = xyToI(x,y);
   return i;
   
+}
+
+int[] iToRing(int index) {
+  int indexOnPanel = index % 61;
+  int[] xy = iToXY(indexOnPanel);
+  int x = xy[0];
+  int y = xy[1];
+  int radius, ringIndex; // radius = 4;
+  if (y == 0) {         // if (y == 4 - radius)
+    radius = 4;         //   radius
+    ringIndex = x;      //   ringIndex = x - y;
+  } else if (x == 0) {  // if (x == 4 - radius)
+    radius = 4;         //   radius
+    ringIndex = 24 - y; //   ringIndex = radius * 6 + x - y
+  } else if (y == 8) {  // if (y == 4 + radius)
+    radius = 4;         //   radius
+    ringIndex = 16 - x; //   ringIndex = radius * 2 + y - x
+  } else if (x == y + 4 || x + y == 12) { // if (x == y + radius || x + y == 8 + radius)
+    radius = 4;         //   radius
+    ringIndex = y + 4;  //   ringIndex = y + 2 * (radius - 2)
+                        // radius--
+  } else if (y == 1) {  // if (y == 4 - radius)
+    radius = 3;         //   radius
+    ringIndex = x - 1;  //   ringIndex = x - y;
+  } else if (x == 1) {  // if (x == 4 - radius)
+    radius = 3;         //   radius
+    ringIndex = 19 - y; //   ringIndex = radius * 6 + x - y
+  } else if (y == 7) {  // if (y == 4 + radius)
+    radius = 3;         //   radius
+    ringIndex = 13 - x; //   ringIndex = radius * 2 + y - x
+  } else if (x == y + 3 || x + y == 11) { // if (x == y + radius || x + y == 8 + radius)
+    radius = 3;         //   radius
+    ringIndex = y + 2;  //   ringIndex = y + 2 * (radius - 2)
+                        // radius--
+  } else if (y == 2) {  // if (y == 4 - radius)
+    radius = 2;         //   radius
+    ringIndex = x - 2;  //   ringIndex = x - y;
+  } else if (x == 2) {  // if (x == 4 - radius)
+    radius = 2;         //   radius
+    ringIndex = 14 - y; //   ringIndex = radius * 6 + x - y
+  } else if (y == 6) {  // if (y == 4 + radius)
+    radius = 2;         //   radius
+    ringIndex = 10 - x; //   ringIndex = radius * 2 + y - x
+  } else if (x == y + 2 || x + y == 10) { // if (x == y + radius || x + y == 8 + radius)
+    radius = 2;         //   radius
+    ringIndex = y;      //   ringIndex = y + 2 * (radius - 2)
+                        // radius--
+  } else if (y == 3) {
+    radius = 1;
+    ringIndex = x - 3;
+  } else if (x == 3) {
+    radius = 1;
+    ringIndex = 9 - y;
+  } else if (y == 5) {
+    radius = 1;
+    ringIndex = 7 - x;
+  } else if (x == y + 1 || x + y == 9) {
+    radius = 1;
+    ringIndex = y - 2;
+                        // radius--
+  } else {
+    radius = 0;
+    ringIndex = 0;
+  }
+  return new int[] {radius, ringIndex};
+}
+
+int iToTriangle(int i) {
+  // replace with useful output
+  return i / 10;
+}
+
+float[] iToPolar(int i) {
+  int[] xy = iToXY(i);
+  float[] rt = cart2polar(xy[0], xy[1], 5, 5);
+  return rt;
 }

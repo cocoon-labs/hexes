@@ -1,14 +1,14 @@
 public class FFTByRing extends Mode {
   
   int freqThresh = 120;
-  int ampFactor = 100;
+  int ampFactor = 20;
   int beatOffset = 11;
   int panelOffset = 10;
-  boolean isShifting = true;
+  boolean isShifting = false;
 
   FFTByRing(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
-    highChance = 1;
+    highChance = 8;
     delayable = true;
   }
 
@@ -24,16 +24,16 @@ public class FFTByRing extends Mode {
         rAmp = constrain(getRingBand(r) * ampFactor, 0, 255);
         for (int i = 0; i < max(1, r * 6); i++) {
           int n = ringToI(r, i);
-          println(n);
           if (rAmp < freqThresh) fadeRing(fadeFactor, r);
           else {
             int[] c = wheel.getColor((int) ((int) (pixelStep * intraloopWSF) * n) + (p * (int) (panelOffset * interloopWSF)), rAmp);
-            panels[p].updateOneByAverage(new int[] {c[0], c[1], c[2]}, n, fadeFactor * 3 / 4);
+            panels[p].updateOneByAverage(new int[] {c[0], c[1], c[2]}, n, .999);
+            //panels[p].updateOne(new int[] {c[0], c[1], c[2]}, n);
           }
         }
       }
     }
-    if (/*isShifting*/ false) {
+    if (isShifting) {
       shift(shiftDir);
     }
     wheel.turn((int) intraloopWSF);

@@ -159,6 +159,13 @@ class Panel {
     }
   }
   
+  public void updateRing(int wheelPos, int pixelOffset, int radius) {
+    radius = radius % 5;
+    for (int i = 0; i < max(1, radius * 6); i++) {
+      updateOne(wheel.getColor(wheelPos + i * pixelOffset, 255), ringToI(radius, i));
+    }
+  }
+  
   public void updateRingByAverage(int[] c, int radius, float factor) {
     radius = radius % 5;
     

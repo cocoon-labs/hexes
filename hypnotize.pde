@@ -5,7 +5,7 @@ public class Hypnotize extends Mode {
   Hypnotize(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
     delayable = true;
-    highChance = 32;
+    highChance = 16;
   }
   
   public void update() {

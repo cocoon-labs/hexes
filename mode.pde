@@ -5,6 +5,7 @@ class Mode {
   float fadeFactor;
   int chance;
   int nPanels, nPixels;
+  int nRings = 5;
   int prevTime;
   boolean justEntered = false;
   boolean delayable = false;
@@ -70,6 +71,12 @@ class Mode {
     }
   }
   
+  public void updateRing(int wheelPos, int pixelOffset, int r) {
+    for (int i = 0; i < nPanels; i++) {
+      panels[i].updateRing(wheelPos, pixelOffset, r);
+    }
+  }
+  
   public void refreshColors() {
     for (int i = 0; i < nPanels; i++) {
       panels[i].refreshColors();
@@ -106,6 +113,12 @@ class Mode {
       for (int j = 0; j < 7; j++) {
         rotateSmallHex(i, j, clockwise);
       }
+    }
+  }
+  
+  public void rotateSmallHexesOne(boolean clockwise, int p) {
+    for (int j = 0; j < 7; j++) {
+        rotateSmallHex(p, j, clockwise);
     }
   }
   
@@ -193,6 +206,23 @@ class Mode {
         break;
       case 2 :
         rotateSmallHexes(direction);
+        break;
+    }
+  }
+  
+  void shiftRandomPanel(boolean direction) {
+    int[] c = wheel.getColor(0, globalBrightness);
+    int p = rand.nextInt(nPanels);
+    switch(shiftStyle) {
+      case 0 :
+        //shiftOutOne(c, p, direction);
+        shiftOutOne(c, p, true);
+        break;
+      case 1 :
+        spiralOutOne(c, p, direction);
+        break;
+      case 2 :
+        rotateSmallHexesOne(direction, p);
         break;
     }
   }

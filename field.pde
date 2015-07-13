@@ -6,9 +6,9 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  Mode[] modes = new Mode[6];
+  Mode[] modes = new Mode[7];
   int nModes;
-  int mode = 5;
+  int mode = 6;
   OPC opc;
   
   Field(int chanceFactor, int modeChance, OPC opc) {
@@ -30,7 +30,7 @@ class Field {
     modes[3] = new FFTByRandomPixel(panels, wheel, 0.99, chance);
     modes[4] = new Hypnotize(panels, wheel, 0.98, chance);
     modes[5] = new Ninja(panels, wheel, 0.93, chance);
-    
+    modes[6] = new GradientWipe(panels, wheel, 0.9, 1.07, chance);
   }
   
   void draw() {
@@ -91,7 +91,7 @@ class Field {
   }
 
   public void setModeChance(float factor) {
-    modeChance = (int) (5024.0 - 5000.0 * factor);
+    modeChance = (int) (5100.0 - 5000.0 * factor);
     faderModeChance = factor;
   }
   
