@@ -5,11 +5,14 @@ public class GradientWipe extends Mode {
   boolean fadingIn = false;
   float fadeInFactor;
   int fadeCounter = 0;
+  int fadeCounterMax = 73;
   int counter = 0;
+  float xOff = 0.0;
+  float yOff = 0.0;
   
-  int wipeTypeChance = 16;
-  int typesOfWipe = 4;
-  int wipeType = 3;
+  int wipeTypeChance = 4;
+  int typesOfWipe = 6;
+  int wipeType = 5;
   
   GradientWipe(Panel[] panels, ColorWheel wheel, float fadeFactor, float fadeInFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
@@ -33,7 +36,7 @@ public class GradientWipe extends Mode {
       }
       wheel.turn((int) (loopOffset * interloopWSF));
       refreshColors();
-      if (fadeCounter < 73)
+      if (fadeCounter < fadeCounterMax)
         fadeCounter++;
       else {
         fadingIn = false;
@@ -58,6 +61,10 @@ public class GradientWipe extends Mode {
         fadingIn = false;
         counter++;
         wipeType = newType;
+        if (wipeType == 4) {
+          xOff = random(15) + 5;
+          yOff = random(15) + 5;
+        }
       }
     }
   }
@@ -76,6 +83,8 @@ public class GradientWipe extends Mode {
     float colorSpread = 256.0 * sinFactor;
     float pixelStep;
     int[] c;
+    //xOff = map(mouseX, 0.0, width, 5.0, 20.0);
+    //yOff = map(mouseX, 0.0, height, 5.0, 20.0);
     switch(wipeType) {
       case 0: // BY INDEX
         pixelStep = colorSpread / nPixels;
@@ -88,14 +97,25 @@ public class GradientWipe extends Mode {
         int ringIndex = ringStuff[1];
         c = wheel.getColor((int) (pixelStep * radius) + ringIndex * max(1, radius * 6), 255);
         break;
-      case 2: // BY TRIANGLE
+      case 2: // BY TRIANGLE 0
         pixelStep = 10; // something
-        c = wheel.getColor((int) (iToTriangle(i) * pixelStep), 255); // define target color
+        int[] tri0 = iToTriangle0(i);
+        c = wheel.getColor((int) (tri0[0] * pixelStep) + tri0[1] * 10, 255); // define target color
         break;
-      case 3: // BY POLAR COORDINATES
+      case 3: // BY TRIANGLE 1
+        pixelStep = 10; // something
+        int[] tri1 = iToTriangle1(i);
+        c = wheel.getColor((int) (tri1[0] * pixelStep) + tri1[1] * 10, 255); // define target color
+        break;
+      case 4: // BY POLAR COORDINATES
         pixelStep = colorSpread / 100 / nRings;
-        float[] rt = iToPolar(i);
+        float[] rt = iToPolar(i, xOff, yOff);
         c = wheel.getColor((int) (pixelStep * rt[0] + rt[1] * max(1, rt[0] * 6)), 255);
+        break;
+      case 5: // BY TRIANGLE 2
+        pixelStep = 10; // something
+        int[] tri2 = iToTriangle2(i);
+        c = wheel.getColor((int) (tri2[0] * pixelStep) + tri2[1] * 10, 255); // define target color
         break;
       default:
         c = wheel.getColor(0, 255);

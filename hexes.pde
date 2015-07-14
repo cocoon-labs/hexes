@@ -1,6 +1,5 @@
 import java.util.Random;
 import java.lang.Math;
-import java.util.Date;
 import java.awt.Color;
 import ddf.minim.analysis.*;
 import ddf.minim.*;
@@ -15,7 +14,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 2000;
+int displaySize = 400;
 int iHex = 0;
 Field field;
 OPC opc;
@@ -75,7 +74,10 @@ void setup() {
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.1.150", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.42.132", myListeningPort);
+  
+  //TEMPORARY <<<<<<<<<<<<<-------------------------------------------------------------------------------------------------------------
+  interloopWSF = 5.0;
 }
 
 void draw() {
@@ -86,7 +88,15 @@ void draw() {
 }
 
 void keyPressed() {
-  field.setMode((field.mode + 1) % field.nModes);
+  if (key == 'f') {
+    fxOn = !fxOn;
+  } else if (key == 'g') {
+    fxNum = (fxNum + 1) % numFX;
+  } else if (key == 'h') {
+    fxTimed = !fxTimed;
+  } else {
+    field.setMode((field.mode + 1) % field.nModes);
+  }
 }
 
 void oscEvent(OscMessage theOscMessage) 
@@ -591,13 +601,72 @@ int[] iToRing(int index) {
   return new int[] {radius, ringIndex};
 }
 
-int iToTriangle(int i) {
-  // replace with useful output
-  return i / 10;
+float[] iToPolar(int i, float xOff, float yOff) {
+  int[] xy = iToXY(i);
+  float[] rt = cart2polar(xy[0], xy[1], xOff, yOff);
+  return rt;
 }
 
-float[] iToPolar(int i) {
+// returns {group index, sub index}
+int[] iToTriangle0(int i) {
   int[] xy = iToXY(i);
-  float[] rt = cart2polar(xy[0], xy[1], 5, 5);
-  return rt;
+  int x = xy[0];
+  int y = xy[1];
+  int[] ring = iToRing(i);
+  int mainI;
+  int subI = ring[0] - 1;
+  if (x == 4 && y == 4) {
+    mainI = 0;
+    subI = 0;
+  } else if (x == y && x < 4) {
+    mainI = 7;
+  } else if (x == 4 && y > 4) {
+    mainI = 10;
+  } else if (x == 4 && y < 4) {
+    mainI = 8;
+  } else if (y == 4) {
+    if (x < 4) {
+      mainI = 12;
+    } else {
+      mainI = 9;
+    }
+  } else if (x + y == 8 && y > 4) {
+    mainI = 11;
+  } else if (y < 4 && x > 4) {
+    mainI = 3;
+  } else if (y > 4 && x > 4) {
+    mainI = 4;
+  } else if (x + y > 9) {
+    mainI = 5;
+  } else if (y > 4) {
+    mainI = 6;
+  } else if (y < 4 && (x == 0 || (x == 1 && y > 1) || (x == 2 && y == 3))) {
+    mainI = 1;
+  } else {
+    mainI = 2;
+  } 
+  return new int[] {mainI, subI};
+}
+
+// returns {group index, sub index}
+int[] iToTriangle1(int i) {
+  int[] tri0 = iToTriangle0(i);
+  if (tri0[0] > 0) {
+    if (tri0[0] < 7) {
+      tri0[0] += 6;
+    } else {
+      tri0[0] -= 6;
+    }
+  }
+  return new int[] {tri0[0], tri0[1]};
+}
+
+int[] iToTriangle2(int i) {
+  int[] tri1 = iToTriangle1(i);
+  int[] ring = iToRing(i);
+  if (tri1[0] > 6 && ring[0] == 4) {
+    tri1[0] += 6;
+    tri1[1] = ring[1];
+  }
+  return new int[] {tri1[0], tri1[1]};
 }

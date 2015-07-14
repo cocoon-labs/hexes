@@ -38,10 +38,22 @@ class Panel {
     rotate(PI / 6);
     translate(- 4 * radius, - 4 * delta);
     
+    
+    int t = millis();
     for (int row = 0; row < 9; row++) {
       pushMatrix();
       for (int n = rowStarts[row]; n < rowEnds[row] + 1; n++) {
         fill(colors[n][0], colors[n][1], colors[n][2]);
+        // ADDED THIS ///////////////////////////////////////////////////////////////////////////
+        if (fxOn) {
+          if (fxTimed) {
+            t = millis();
+          }
+          int[] colorsFX = fx(colors[n][0], colors[n][1], colors[n][2], t);
+          colorsFX = averageColor(colors[n], colorsFX, 1.0 - fxGain);
+          fill(colorsFX[0], colorsFX[1], colorsFX[2]);
+        }
+        ////////////////
         pushMatrix();
         hexagon(0, 0, radius, false);
         popMatrix();

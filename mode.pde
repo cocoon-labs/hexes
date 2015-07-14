@@ -49,6 +49,7 @@ class Mode {
     if (rand.nextInt(chance) == 0) {
       wheel.newScheme();
     }
+    randomizeFX();
   }
   
   public void fadeAll(float factor) {
