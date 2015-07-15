@@ -69,7 +69,7 @@ void setup() {
   //drawHexes();
 
   opc = new OPC(this, "127.0.0.1", 7890);
-  field = new Field(500, 80, opc);
+  field = new Field(500, 320, opc);
   
   oscP5 = new OscP5(this, myListeningPort);
  
@@ -94,7 +94,7 @@ void keyPressed() {
     fxNum = (fxNum + 1) % numFX;
   } else if (key == 'h') {
     fxTimed = !fxTimed;
-  } else {
+  } else if (key != 's') {
     field.setMode((field.mode + 1) % field.nModes);
   }
 }

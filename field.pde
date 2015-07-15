@@ -6,9 +6,9 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  Mode[] modes = new Mode[8];
+  Mode[] modes = new Mode[10];
   int nModes;
-  int mode = 7;
+  int mode = 8;
   OPC opc;
   
   Field(int chanceFactor, int modeChance, OPC opc) {
@@ -32,6 +32,8 @@ class Field {
     modes[5] = new Ninja(panels, wheel, 0.93, chance);
     modes[6] = new GradientWipe(panels, wheel, 0.9, 1.07, chance);
     modes[7] = new Flowers(panels, wheel, 0.97, chance);
+    modes[8] = new Paraguay(panels, wheel, 0.99, chance);
+    modes[9] = new Snake(panels, wheel, 0.50, chance);
   }
   
   void draw() {
