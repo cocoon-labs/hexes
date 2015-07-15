@@ -2,7 +2,6 @@ public class Ninja extends Mode {
 
   int expansionFactor = 0;
   int inc = -1;
-  int triangleN = 15;
   int index = 0;
   int direction = 1;
   int freqThresh = 80;

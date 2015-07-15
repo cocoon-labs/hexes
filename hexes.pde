@@ -14,7 +14,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 400;
+int displaySize = 1000;
 int iHex = 0;
 Field field;
 OPC opc;
@@ -57,12 +57,12 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  bpm = new BPMDetector(in);
+  // in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  // bpm = new BPMDetector(in);
   
   // MP3 in
-  //sound = minim.loadFile(song);
-  //bpm = new BPMDetector(sound);
+  sound = minim.loadFile(song);
+  bpm = new BPMDetector(sound);
   
   bpm.setup();
   
@@ -74,7 +74,7 @@ void setup() {
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.42.132", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.2.253", myListeningPort);
   
   //TEMPORARY <<<<<<<<<<<<<-------------------------------------------------------------------------------------------------------------
   interloopWSF = 5.0;
@@ -84,7 +84,7 @@ void draw() {
   field.randomize();
   field.update();
   field.draw();
-  //field.send();
+  // field.send();
 }
 
 void keyPressed() {

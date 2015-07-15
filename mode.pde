@@ -6,6 +6,8 @@ class Mode {
   int chance;
   int nPanels, nPixels;
   int nRings = 5;
+  int triangleN = 15;
+  int nTriangles = 6;
   int prevTime;
   boolean justEntered = false;
   boolean delayable = false;
