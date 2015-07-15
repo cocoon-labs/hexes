@@ -8,7 +8,7 @@ class Field {
   float faderModeChance = 0.02;
   Mode[] modes = new Mode[10];
   int nModes;
-  int mode = 8;
+  int mode = 6;
   OPC opc;
   
   Field(int chanceFactor, int modeChance, OPC opc) {

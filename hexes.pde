@@ -26,7 +26,7 @@ AudioPlayer sound;
 AudioInput in;
 int bufferSize = 1024;
 float sampleRate = 44100;
-String song = "dlp.mp3";
+String song = "ohl.mp3";
 
 // remote stuff
 int globalBrightness = 255;
@@ -84,7 +84,7 @@ void draw() {
   field.randomize();
   field.update();
   field.draw();
-  // field.send();
+  field.send();
 }
 
 void keyPressed() {
