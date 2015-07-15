@@ -39,6 +39,7 @@ class Mode {
       onBeat();
       randomize();
     }
+    fxGain = map(bpm.getBand(1), 0, 2000, 0, 1);
   }
   
   public void onBeat() {
@@ -248,6 +249,60 @@ class Mode {
     for (int j = 12; j < 15; j++) {
       updateTriangleByIndex(c, pIdx, tri, j);
     }
+  }
+  
+  int randomNeighbor(int index) {
+    int panel = index / 61;
+    int indexOnPanel = index % 61;
+    int[] xy = iToXY(index);
+    int x = xy[0];
+    int y = xy[1];
+    int neighborIndex = 0;
+    int[] neighbors = new int[6];
+    int pixelsInRow = pixelsInRow(y);
+    if (x > 0) {
+      neighbors[neighborIndex] = xyToI(x - 1, y);
+      neighborIndex++;
+    }
+    if (x < pixelsInRow - 1) {
+      neighbors[neighborIndex] = xyToI(x + 1, y);
+      neighborIndex++;
+    }
+    if (y > 4) {
+      neighbors[neighborIndex] = xyToI(x, y - 1);
+      neighborIndex++;
+      neighbors[neighborIndex] = xyToI(x + 1, y - 1);
+      neighborIndex++;
+    } else if (y > 0) {
+      if (x > 0) {
+        neighbors[neighborIndex] = xyToI(x - 1, y - 1);
+        neighborIndex++;
+      }
+      if (x < pixelsInRow - 1) {
+        neighbors[neighborIndex] = xyToI(x, y - 1);
+        neighborIndex++;
+      }
+    }
+    if (y < 4) {
+      neighbors[neighborIndex] = xyToI(x, y + 1);
+      neighborIndex++;
+      neighbors[neighborIndex] = xyToI(x + 1, y + 1);
+      neighborIndex++;
+    } else if (y < 8) {
+      if (x > 0) {
+        neighbors[neighborIndex] = xyToI(x - 1, y + 1);
+        neighborIndex++;
+      }
+      if (x < pixelsInRow - 1) {
+        neighbors[neighborIndex] = xyToI(x, y + 1);
+        neighborIndex++;
+      }
+    }
+    return panel * 61 + neighbors[rand.nextInt(neighborIndex)];
+  }
+  
+  int pixelsInRow(int row) {
+    return 1 + rowEnds[row] - rowStarts[row];
   }
   
 }

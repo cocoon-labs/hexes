@@ -14,7 +14,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 400;
+int displaySize = 2000;
 int iHex = 0;
 Field field;
 OPC opc;
@@ -69,12 +69,12 @@ void setup() {
   //drawHexes();
 
   opc = new OPC(this, "127.0.0.1", 7890);
-  field = new Field(500, 80, opc);
+  field = new Field(500, 320, opc);
   
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.42.132", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.2.149", myListeningPort);
   
   //TEMPORARY <<<<<<<<<<<<<-------------------------------------------------------------------------------------------------------------
   interloopWSF = 5.0;
@@ -94,7 +94,7 @@ void keyPressed() {
     fxNum = (fxNum + 1) % numFX;
   } else if (key == 'h') {
     fxTimed = !fxTimed;
-  } else {
+  } else if (key != 's') {
     field.setMode((field.mode + 1) % field.nModes);
   }
 }

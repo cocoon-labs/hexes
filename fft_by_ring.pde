@@ -17,6 +17,7 @@ public class FFTByRing extends Mode {
     super.update();
     
     int rAmp = constrain(getRingBand(0) * ampFactor, 0, 255);
+    //int rAmp = 255;
     float pixelStep = 256.0 / 61;
     
     for (int p = 0; p < nPanels; p++) {
@@ -27,8 +28,8 @@ public class FFTByRing extends Mode {
           if (rAmp < freqThresh) fadeRing(fadeFactor, r);
           else {
             int[] c = wheel.getColor((int) ((int) (pixelStep * intraloopWSF) * n) + (p * (int) (panelOffset * interloopWSF)), rAmp);
-            panels[p].updateOneByAverage(new int[] {c[0], c[1], c[2]}, n, .999);
-            //panels[p].updateOne(new int[] {c[0], c[1], c[2]}, n);
+            //panels[p].updateOneByAverage(new int[] {c[0], c[1], c[2]}, n, .999);
+            panels[p].updateOne(new int[] {c[0], c[1], c[2]}, n);
           }
         }
       }

@@ -8,10 +8,12 @@ int numFX = 5;
 int fxNum = 4;
 
 int[] fx(int r, int g, int b, int t) {
-  fxGain = map(mouseY, 0, height, 0, 1);
+  //fxGain = map(mouseY, 0, height, 0, 1);
   float newR = r;
   float newG = g;
   float newB = b;
+  
+  
   
   switch(fxNum) {
     case 0:
@@ -49,7 +51,7 @@ void randomizeFX() {
     a = random(1);
   }
   if (rand.nextInt(fxChance) == 0) {
-    fxOn = !fxOn;
+    //fxOn = !fxOn;
   }
   if (rand.nextInt(fxChance) == 0) {
     fxNum = rand.nextInt(numFX);
