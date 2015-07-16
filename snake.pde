@@ -6,7 +6,6 @@ public class Snake extends Mode {
   int numSnakes;
   int beatOffset = 1;
   int snakeOffset = 5;
-  boolean isShifting = true;
   int ampFactor = 20;
 
   Snake(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
@@ -38,20 +37,19 @@ public class Snake extends Mode {
     if (rand.nextInt(highChance) == 0) {
       killSnake();
     }
+//    if (rand.nextInt(highChance) == 0) {
+//      fadeFactor = 0.5 + rand.nextInt(500) / 1000;
+//    }
     if (rand.nextInt(highChance) == 0) {
-      fadeFactor = 0.5 + rand.nextInt(500) / 1000;
+      if (rand.nextInt(2) == 0) {
+        fadeFactor = fadeFactor + 0.05;
+      } else {
+        fadeFactor = fadeFactor - 0.05;
+      }
+      fadeFactor = constrain(fadeFactor, 0.5, 0.9);
     }
     if (rand.nextInt(highChance / 2) == 0) {
       fadeFactor = (fadeFactor + 1) / 2;
-    }
-    if (rand.nextInt(100) == 0) {
-      isShifting = !isShifting;
-    }
-    if (rand.nextInt(highChance) == 0) {
-      shiftStyle = rand.nextInt(nShiftStyles);
-    }
-    if (isShifting && rand.nextInt(4) == 0) {
-      //shift(true);
     }
     if (rand.nextInt(highChance) == 0) {
       int i = rand.nextInt(nPixels);

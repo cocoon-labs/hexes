@@ -73,8 +73,19 @@ class Panel {
   }
 
   public void ship(int idxOffset) {
+    int t = millis();
     for (int i = 0; i < nPixels; i++) {
-      opc.setPixel(idxOffset + i, colors[i][0] << 16 | colors[i][1] << 8 | colors[i][2]);
+      if (i % 61 == 0) t = millis();
+      if (fxOn) {
+        if (/*fxTimed*/ true) {
+          t = millis();
+        }
+        int[] colorsFX = fx(colors[i][0], colors[i][1], colors[i][2], t);
+        colorsFX = averageColor(colors[i], colorsFX, 1.0 - fxGain);
+        opc.setPixel(idxOffset + i, colorsFX[0] << 16 | colorsFX[1] << 8 | colorsFX[2]);
+      } else {
+        opc.setPixel(idxOffset + i, colors[i][0] << 16 | colors[i][1] << 8 | colors[i][2]);
+      }
     }
     opc.writePixels();
   }

@@ -14,8 +14,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 1000;
-int iHex = 0;
+int displaySize = 2000;
 Field field;
 OPC opc;
 
@@ -31,7 +30,6 @@ String song = "ohl.mp3";
 // remote stuff
 int globalBrightness = 255;
 boolean modeSwitching = false;
-int modeC = 2;
 boolean houseLightsOn = false;
 float intraloopWSF = 1.0; // WSF = wheel step factor
 float interloopWSF = 1.0; // WSF = wheel step factor
@@ -57,12 +55,12 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  // in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  // bpm = new BPMDetector(in);
+  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  bpm = new BPMDetector(in);
   
   // MP3 in
-  sound = minim.loadFile(song);
-  bpm = new BPMDetector(sound);
+  //sound = minim.loadFile(song);
+  //bpm = new BPMDetector(sound);
   
   bpm.setup();
   
@@ -74,7 +72,7 @@ void setup() {
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.2.253", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.2.149", myListeningPort);
   
   //TEMPORARY <<<<<<<<<<<<<-------------------------------------------------------------------------------------------------------------
   interloopWSF = 5.0;
@@ -188,7 +186,6 @@ void oscEvent(OscMessage theOscMessage)
       field.setVibeWhite();
       globalBrightness = 255;
       modeSwitching = false;
-      modeC = 0;
       houseLightsOn = true;
     } else {
       field.setRainbow();
@@ -669,4 +666,23 @@ int[] iToTriangle2(int i) {
     tri1[1] = ring[1];
   }
   return new int[] {tri1[0], tri1[1]};
+}
+
+int spiralToI(int spiralIndex, int ringOffset) {
+  int panel = spiralIndex / 61;
+  spiralIndex = spiralIndex % 61;
+  int index = 0;
+  if (spiralIndex == 0) return panel * 61 + ringToI(0, 0);
+  int startPixel = 1;
+  int endPixel = 6;
+  for (int r = 1; r < 5; r++) {
+    int pixelsOnRing = r * 6;
+    if (spiralIndex <= endPixel) {
+      index = ringToI(r, (spiralIndex - startPixel + ringOffset) % pixelsOnRing);
+      break;
+    }
+    startPixel += pixelsOnRing;
+    endPixel += (r + 1) * 6;
+  }
+  return panel * 61 + index;
 }

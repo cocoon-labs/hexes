@@ -6,16 +6,15 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  Mode[] modes = new Mode[10];
-  int nModes;
-  int mode = 6;
+  int nModes = 13;
+  Mode[] modes = new Mode[nModes];
+  int mode = 11;
   OPC opc;
   
   Field(int chanceFactor, int modeChance, OPC opc) {
     
     this.opc = opc;
     nPanels = 7;
-    nModes = modes.length;
     panels = new Panel[nPanels];
     wheel = new ColorWheel();
     for (int i = 0; i < nPanels; i++) {
@@ -34,6 +33,9 @@ class Field {
     modes[7] = new Flowers(panels, wheel, 0.97, chance);
     modes[8] = new Paraguay(panels, wheel, 0.99, chance);
     modes[9] = new Snake(panels, wheel, 0.50, chance);
+    modes[10] = new StarTrek(panels, wheel, 1.1, chance);
+    modes[11] = new Spiral(panels, wheel, 0.50, chance);
+    modes[12] = new Vertigo(panels, wheel, 0.70, chance);
   }
   
   void draw() {

@@ -1,5 +1,5 @@
 float a = 1;
-int fxChance = 500;
+int fxChance = 16;
 boolean fxOn = false;
 boolean fxTimed = true;
 float fxGain = .1;

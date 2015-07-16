@@ -69,6 +69,11 @@ class Mode {
     panels[index / 61].updateOne(c, index % 61);
   }
   
+  public void updateBySpiralIndex(int[] c, int spiralIndex, int ringOffset) {
+    int index = spiralToI(spiralIndex, ringOffset);
+    panels[index / 61].updateOne(c, index % 61);
+  }
+  
   public void updateRing(int[] c, int r) {
     for (int i = 0; i < nPanels; i++) {
       panels[i].updateRing(c, r);
@@ -79,6 +84,10 @@ class Mode {
     for (int i = 0; i < nPanels; i++) {
       panels[i].updateRing(wheelPos, pixelOffset, r);
     }
+  }
+  
+  public void updateByRingIndex(int[] c, int panel, int radius, int index) {
+    panels[panel].updateByRingIndex(c, radius, index);
   }
   
   public void refreshColors() {
