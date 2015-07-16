@@ -46,11 +46,9 @@ class Panel {
         fill(colors[n][0], colors[n][1], colors[n][2]);
         // ADDED THIS ///////////////////////////////////////////////////////////////////////////
         if (fxOn) {
-          if (fxTimed) {
-            t = millis();
-          }
+          if (n % fxTime == 0) t = millis();
           int[] colorsFX = fx(colors[n][0], colors[n][1], colors[n][2], t);
-          colorsFX = averageColor(colors[n], colorsFX, 1.0 - fxGain);
+          colorsFX = averageColor(colors[n], colorsFX, 1.0 - dryWet);
           fill(colorsFX[0], colorsFX[1], colorsFX[2]);
         }
         ////////////////
@@ -75,13 +73,10 @@ class Panel {
   public void ship(int idxOffset) {
     int t = millis();
     for (int i = 0; i < nPixels; i++) {
-      if (i % 61 == 0) t = millis();
       if (fxOn) {
-        if (/*fxTimed*/ true) {
-          t = millis();
-        }
+        if (i % fxTime == 0) t = millis();
         int[] colorsFX = fx(colors[i][0], colors[i][1], colors[i][2], t);
-        colorsFX = averageColor(colors[i], colorsFX, 1.0 - fxGain);
+        colorsFX = averageColor(colors[i], colorsFX, 1.0 - dryWet);
         opc.setPixel(idxOffset + i, colorsFX[0] << 16 | colorsFX[1] << 8 | colorsFX[2]);
       } else {
         opc.setPixel(idxOffset + i, colors[i][0] << 16 | colors[i][1] << 8 | colors[i][2]);

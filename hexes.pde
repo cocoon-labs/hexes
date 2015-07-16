@@ -32,8 +32,11 @@ int globalBrightness = 255;
 boolean modeSwitching = false;
 boolean houseLightsOn = false;
 float intraloopWSF = 1.0; // WSF = wheel step factor
+float midWSF = 1.0; // WSF = wheel step factor
 float interloopWSF = 1.0; // WSF = wheel step factor
 int delay = 0;
+float gainFactor = 1.0;
+float fubar = 1.0;
 
 int[] rowStarts = new int[] {0, 5, 11, 18, 26, 35, 43, 50, 56};
 int[] rowEnds = new int[] {4, 10, 17, 25, 34, 42, 49, 55, 60};
@@ -73,26 +76,21 @@ void setup() {
  
   // set the remote location to be the localhost on port 5001
   myRemoteLocation = new NetAddress("192.168.2.149", myListeningPort);
-  
-  //TEMPORARY <<<<<<<<<<<<<-------------------------------------------------------------------------------------------------------------
-  interloopWSF = 5.0;
 }
 
 void draw() {
   field.randomize();
   field.update();
   field.draw();
-  field.send();
+  //field.send();
 }
 
 void keyPressed() {
   if (key == 'f') {
     fxOn = !fxOn;
   } else if (key == 'g') {
-    fxNum = (fxNum + 1) % numFX;
-  } else if (key == 'h') {
-    fxTimed = !fxTimed;
-  } else if (key != 's') {
+    fxMode = (fxMode + 1) % numFX;
+  } else {
     field.setMode((field.mode + 1) % field.nModes);
   }
 }
@@ -106,31 +104,19 @@ void oscEvent(OscMessage theOscMessage)
   float x, y;
   int a0, a1;
   
-  /*if (addPatt.length() >= 3) {
-    OscMessage syncMessage = new OscMessage(addPatt);
-    for(int i = 0; i < theOscMessage.typetag().length(); i++) {
-      syncMessage.add(theOscMessage.get(i).floatValue());
-    }
-    oscP5.send(syncMessage, myNetAddressList);
-  }*/
-  
   if (addPatt.length() < 3) {
     //println("Page change");
-  } else if (addPatt.equals("/xy0")) {
-    y = theOscMessage.get(0).floatValue();
-    x = theOscMessage.get(1).floatValue();
-    
-  } else if (addPatt.equals("/xy1")) {
-    y = theOscMessage.get(0).floatValue();
-    x = theOscMessage.get(1).floatValue();
-    intraloopWSF = map(y, 0.0, 1.0, 0.0, 5.0);
-    interloopWSF = map(x, 0.0, 1.0, 0.0, 5.0);
   } else if (patLen == 9 && addPatt.substring(0, 5).equals("/mode")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
-      a0 = 3 - Integer.parseInt(addPatt.substring(6, 7));
+      a0 = 5 - Integer.parseInt(addPatt.substring(6, 7));
       a1 = Integer.parseInt(addPatt.substring(8, 9)) - 1;
-      field.setMode((4 * a0 + a1) % field.nModes);
-      
+      field.setMode((5 * a0 + a1) % field.nModes);
+    }
+  } else if (patLen == 11 && addPatt.substring(0, 7).equals("/fxMode")) {
+    if (theOscMessage.get(0).floatValue() == 1.0) {
+      a0 = 3 - Integer.parseInt(addPatt.substring(8, 9));
+      a1 = Integer.parseInt(addPatt.substring(10, 11)) - 1;
+      fxMode = (4 * a0 + a1) % numFX;
     }
   } else if (patLen == 9 && addPatt.substring(0,7).equals("/faders")) {
     int faderNum = Integer.parseInt(addPatt.substring(8,9));
@@ -145,10 +131,26 @@ void oscEvent(OscMessage theOscMessage)
     case 3: // delay
       field.adjustDelay((int) map(faderVal, 0.0, 1.0, 0.0, 255.0));
       break;
-    case 4: // intraloop wheel step factor
+    case 4: // 
+      fubar = faderVal;
+      break;
+    case 5: // incoming audio signal gain
+      gainFactor = faderVal;
+      break;
+    default:
+      break;
+    }
+  } else if (patLen == 12 && addPatt.substring(0,10).equals("/colorStep")) {
+    int faderNum = Integer.parseInt(addPatt.substring(11,12));
+    float faderVal = theOscMessage.get(0).floatValue();
+    switch(faderNum) {
+    case 1: // low
       intraloopWSF = map(faderVal, 0.0, 1.0, 0.0, 5.0);
       break;
-    case 5: // interloop wheel step factor
+    case 2: // mid
+      midWSF = map(faderVal, 0.0, 1.0, 0.0, 5.0);
+      break;
+    case 3: // high
       interloopWSF = map(faderVal, 0.0, 1.0, 0.0, 5.0);
       break;
     default:
@@ -180,6 +182,22 @@ void oscEvent(OscMessage theOscMessage)
     if (theOscMessage.get(0).floatValue() == 1.0) {
       modeSwitching = true;
     } else modeSwitching = false;
+  } else if (addPatt.equals("/fxOn")) {
+    if (theOscMessage.get(0).floatValue() == 1.0) {
+      fxOn = true;
+    } else fxOn = false;
+  } else if (addPatt.equals("/fxRand")) {
+    if (theOscMessage.get(0).floatValue() == 1.0) {
+      fxRand = true;
+    } else fxRand = false;
+  } else if (addPatt.equals("/dryWet")) {
+    dryWet = theOscMessage.get(0).floatValue();
+  } else if (addPatt.equals("/fxChance")) {
+    fxChance = (int) theOscMessage.get(0).floatValue();
+  } else if (addPatt.equals("/fxTime")) {
+    fxTime = (int) theOscMessage.get(0).floatValue();
+  } else if (addPatt.equals("/coeff")) {
+    coeff = theOscMessage.get(0).floatValue();
   } else if (addPatt.equals("/house")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
       
@@ -205,7 +223,11 @@ void oscSync()
 {
   OscMessage message;
   
-  message = new OscMessage("/mode/" + str(3 - field.mode / 4) + "/" + str(field.mode % 4 + 1));
+  message = new OscMessage("/mode/" + str(5 - field.mode / 5) + "/" + str(field.mode % 5 + 1));
+  message.add(1.0);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/fxMode/" + str(3 - fxMode / 4) + "/" + str(fxMode % 4 + 1));
   message.add(1.0);
   oscP5.send(message, myNetAddressList);
   
@@ -215,6 +237,14 @@ void oscSync()
   
   message = new OscMessage("/house");
   message.add(houseLightsOn ? 1.0 : 0.0);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/fxOn");
+  message.add(fxOn ? 1.0 : 0.0);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/fxRand");
+  message.add(fxRand ? 1.0 : 0.0);
   oscP5.send(message, myNetAddressList);
   
   message = new OscMessage("/faders/1");
@@ -230,34 +260,51 @@ void oscSync()
   oscP5.send(message, myNetAddressList);
   
   message = new OscMessage("/faders/4");
-  message.add(map(intraloopWSF, 0.0, 5.0, 0.0, 1.0));
+  message.add(fubar);
   oscP5.send(message, myNetAddressList);
   
   message = new OscMessage("/faders/5");
+  message.add(gainFactor);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/colorStep/1");
+  message.add(map(intraloopWSF, 0.0, 5.0, 0.0, 1.0));
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/colorStep/2");
+  message.add(map(midWSF, 0.0, 5.0, 0.0, 1.0));
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/colorStep/3");
   message.add(map(interloopWSF, 0.0, 5.0, 0.0, 1.0));
   oscP5.send(message, myNetAddressList);
   
-  /*message = new OscMessage("/xy0");
-  float[] vals = field.getAlgebraVals();
-  message.add(vals[1]);
-  message.add(vals[0]);
-  oscP5.send(message, myNetAddressList);*/
+  message = new OscMessage("/dryWet");
+  message.add(dryWet);
+  oscP5.send(message, myNetAddressList);
   
-  message = new OscMessage("/xy1");
-  message.add(map(intraloopWSF, 0.0, 5.0, 0.0, 1.0));
-  message.add(map(interloopWSF, 0.0, 5.0, 0.0, 1.0));
+  message = new OscMessage("/fxChance");
+  message.add(fxChance);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/fxTime");
+  message.add(fxTime);
+  oscP5.send(message, myNetAddressList);
+  
+  message = new OscMessage("/coeff");
+  message.add(coeff);
   oscP5.send(message, myNetAddressList);
 }
 
 private void oscConnect(String theIPaddress) {
   if (!myNetAddressList.contains(theIPaddress, myBroadcastPort)) {
     myNetAddressList.add(new NetAddress(theIPaddress, myBroadcastPort));
-    //println("### adding " + theIPaddress + " to the list.");
+    println("### adding " + theIPaddress + " to the list.");
     //oscSync();
   } else {
-    //println("### " + theIPaddress + " is already connected.");
+    println("### " + theIPaddress + " is already connected.");
   }
-  //println("### currently there are "+myNetAddressList.list().size()+" remote locations connected.");
+  println("### currently there are "+myNetAddressList.list().size()+" remote locations connected.");
 }
 
 

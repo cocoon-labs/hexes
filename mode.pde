@@ -41,7 +41,6 @@ class Mode {
       onBeat();
       randomize();
     }
-    fxGain = map(bpm.getBand(1), 0, 2000, 0, 1);
   }
   
   public void onBeat() {

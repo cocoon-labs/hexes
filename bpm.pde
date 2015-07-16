@@ -251,12 +251,12 @@ class BPMDetector {
     for (int i = band * 3; i < (band + 1) * 3; i++) {
       sum += fft.getBand(i);
     }
-    return sum / 3;
+    return (int) ((sum / 3) * gainFactor);
   }
   
   // args: 
   //   band: number btwn 0 and 29
   public float getDetailBand(int band) {
-    return fft.getBand(band);
+    return fft.getBand(band) * gainFactor;
   }
 }

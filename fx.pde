@@ -1,62 +1,54 @@
-float a = 1;
-int fxChance = 16;
+int fxChance = 32;
 boolean fxOn = false;
-boolean fxTimed = true;
-float fxGain = .1;
+boolean fxRand = true;
+int fxTime = 1;
+float dryWet = .1;
+float coeff = 1;
 
 int numFX = 5;
-int fxNum = 4;
+int fxMode = 4;
 
 int[] fx(int r, int g, int b, int t) {
-  //fxGain = map(mouseY, 0, height, 0, 1);
   float newR = r;
   float newG = g;
   float newB = b;
   
-  
-  
-  switch(fxNum) {
-    case 0:
-      newR = sin(a * t) * r;
-      newG = cos(a * t) * g;
-      newB = tan(a * t) * b;
+  switch(fxMode) {
+    case 0: // ANNE
+      newR = sin(coeff * t) * r;
+      newG = cos(coeff * t) * g;
+      newB = tan(coeff * t) * b;
       break;
-    case 1:
-      newR = cos(a * t) * r;
-      newG = tan(a * t) * g;
-      newB = sin(a * t) * b;
+    case 1: // BOBO
+      newR = cos(coeff * t) * r;
+      newG = tan(coeff * t) * g;
+      newB = sin(coeff * t) * b;
       break;
-    case 2:
-      newR = tan(a * t) * r;
-      newG = sin(a * t) * g;
-      newB = cos(a * t) * b;
+    case 2: // CASS
+      newR = tan(coeff * t) * r;
+      newG = sin(coeff * t) * g;
+      newB = cos(coeff * t) * b;
       break;
-    case 3:
+    case 3: // DIRK
       newR = sin(r * t) * r;
       newG = sin(r * t) * g;
       newB = sin(b * t) * g;
       break;
-    case 4:
+    case 4: // EARL
       newR = sin(r * t) * r;
       newG = sin(g * t) * g;
       newB = sin(b * t) * b;
       break;
+    default:
+      break;
+    // FRAN, GEO, HANA, IAGO, JOAN, KARL, LILA
   }
   
   return new int[] {(int) newR, (int) newG, (int) newB};
 }
 
 void randomizeFX() {
-  if (rand.nextInt(fxChance) == 0) {
-    a = random(1);
-  }
-  if (rand.nextInt(fxChance) == 0) {
-    //fxOn = !fxOn;
-  }
-  if (rand.nextInt(fxChance) == 0) {
-    fxNum = rand.nextInt(numFX);
-  }
-  if (rand.nextInt(4) == 0) {
-    fxTimed = !fxTimed;
+  if (fxRand && rand.nextInt(fxChance) == 0) {
+    fxMode = rand.nextInt(numFX);
   }
 }
