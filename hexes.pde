@@ -14,7 +14,7 @@ global fade factor
 global audio threshold factor and amplitude multiplier (maybe xy)
  */
 
-int displaySize = 2000;
+int displaySize = 1000;
 Field field;
 OPC opc;
 
@@ -58,12 +58,12 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  bpm = new BPMDetector(in);
+  // in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  // bpm = new BPMDetector(in);
   
   // MP3 in
-  //sound = minim.loadFile(song);
-  //bpm = new BPMDetector(sound);
+  sound = minim.loadFile(song);
+  bpm = new BPMDetector(sound);
   
   bpm.setup();
   
@@ -110,7 +110,13 @@ void oscEvent(OscMessage theOscMessage)
     if (theOscMessage.get(0).floatValue() == 1.0) {
       a0 = 5 - Integer.parseInt(addPatt.substring(6, 7));
       a1 = Integer.parseInt(addPatt.substring(8, 9)) - 1;
-      field.setMode((5 * a0 + a1) % field.nModes);
+      field.setMode((5 * a0 + a1) % field.totalModes());
+      // if (index < 12) {
+      //   field.setMode(index);
+      // } else {
+      //   ((GradientWipe) field.modes[12]).wipeType = index - 12;
+      //   field.setMode(12);
+      // }
     }
   } else if (patLen == 11 && addPatt.substring(0, 7).equals("/fxMode")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
@@ -223,7 +229,7 @@ void oscSync()
 {
   OscMessage message;
   
-  message = new OscMessage("/mode/" + str(5 - field.mode / 5) + "/" + str(field.mode % 5 + 1));
+  message = new OscMessage("/mode/" + str(5 - field.trueMode() / 5) + "/" + str(field.trueMode() % 5 + 1));
   message.add(1.0);
   oscP5.send(message, myNetAddressList);
   

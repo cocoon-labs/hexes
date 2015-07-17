@@ -51,14 +51,14 @@ public class Flowers extends Mode {
   public void onBeat() {
     int[] c;
     for (int i = 0; i < nPanels; i+= skipper) {
-      if (rand.nextInt(chance / 16) == 0) {
-        for (int j = 0; j < nRings; j += constrain(skipper, 1, maxSkip + 1)) {
+      if (rand.nextInt((int) map(fubar, 0, 1, 1, 64)) == 0) {
+        for (int j = 0; j < nRings; j += constrain(skipper, 2, maxSkip + 1)) {
           c = wheel.getColor(j * objStep, constrain(getPanelBand(i) * ampFactor, 0, 255));
-          if (Arrays.equals(panels[i].getOneByRingIndex(j, 0), black))
-            updateRing(c, j);
+          // if (Arrays.equals(panels[i].getOneByRingIndex(j, 0), black))
+          updateRing(c, j);
         }
       }
-      if (rand.nextInt(chance / 16) == 0) {
+      if (rand.nextInt((int) map(fubar, 0, 1, 1, 32)) == 0) {
         for (int j = 0; j < 7; j += skipper) {
           // c = wheel.getColor(j * objStep, brghtness);
           for (int k = 0; k < 7; k += skipper) {
@@ -67,10 +67,6 @@ public class Flowers extends Mode {
               panels[i].updateOneByHex(c, j, k);
             } else rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
           }
-          // for (int k = 0 ; k < 7; k++) {
-          //   // 
-          //     panels[i].updateOneByHex(c, j, k);
-          // }
         }
       }
     }
