@@ -6,17 +6,16 @@ import ddf.minim.*;
 import oscP5.*;
 import netP5.*;
 
-Random rand = new Random();
-
-/* TODO:
-new OSC controls: 
-global fade factor 
-global audio threshold factor and amplitude multiplier (maybe xy)
- */
+Random rand = new Random(); 
 
 int displaySize = 1000;
 Field field;
 OPC opc;
+
+// DISTANCE BETWEEN VIEWABLE AREAS ON PANELS, IN INCHES
+int distanceBetweenPanels = 11;
+// VIDEO SIZE IN PIXELS (SQUARE SCREEN)
+int videoSize = 2000;
 
 // audio crap
 BPMDetector bpm;
@@ -305,12 +304,12 @@ void oscSync()
 private void oscConnect(String theIPaddress) {
   if (!myNetAddressList.contains(theIPaddress, myBroadcastPort)) {
     myNetAddressList.add(new NetAddress(theIPaddress, myBroadcastPort));
-    println("### adding " + theIPaddress + " to the list.");
+    //println("### adding " + theIPaddress + " to the list.");
     //oscSync();
   } else {
-    println("### " + theIPaddress + " is already connected.");
+    //println("### " + theIPaddress + " is already connected.");
   }
-  println("### currently there are "+myNetAddressList.list().size()+" remote locations connected.");
+  //println("### currently there are "+myNetAddressList.list().size()+" remote locations connected.");
 }
 
 
@@ -444,10 +443,35 @@ float[] panelCenter(int iPanel) {
   if (iPanel == 0) {
     center = new float[] {displaySize / 2, displaySize / 2};
   } else {
-    center = polar2cart(displaySize / 3, (iPanel - 2) * TWO_PI / 6, displaySize / 2, displaySize / 2);
+    float panelRadius = (24 + distanceBetweenPanels) * displaySize / (512 / (3 * sqrt(3)));
+    center = polar2cart(panelRadius, (iPanel - 2) * TWO_PI / 6, displaySize / 2, displaySize / 2);
+    //center = polar2cart(displaySize / 3, (iPanel - 2) * TWO_PI / 6, displaySize / 2, displaySize / 2);
   }
   
   return center;
+  
+}
+
+float[] panelCenterForVideoMap(int iPanel) {
+  float[] center;
+  iPanel = iPanel % 7;
+  
+  if (iPanel == 0) {
+    center = new float[] {videoSize / 2, videoSize / 2};
+  } else {
+    float panelRadius = (24 + distanceBetweenPanels) * videoSize / (512 / (3 * sqrt(3)));
+    center = polar2cart(panelRadius, (iPanel - 2) * TWO_PI / 6, videoSize / 2, videoSize / 2);
+  }
+  
+  return center;
+  
+}
+
+float[] rotateTranslate(float x, float y, float angle, float deltaX, float deltaY) {
+  
+  x += deltaX * cos(angle) - deltaY * sin(angle);
+  y += deltaX * sin(angle) + deltaY * cos(angle);
+  return new float[] {x, y};
   
 }
 

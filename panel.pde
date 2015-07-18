@@ -1,9 +1,10 @@
 class Panel {
   
   int[][] colors;
-  int[][] targetColors = new int[61][3];
-  float[] brightVals = new float[61];
   int nPixels = 61;
+  int[][] targetColors = new int[nPixels][3];
+  float[] brightVals = new float[nPixels];
+  float[][] videoMap = new float[nPixels][2];
   ColorWheel wheel;
   int index;
   float[] center;
@@ -26,11 +27,13 @@ class Panel {
       }
       brightVals[i] = 0;
     }
+    
+    loadVideoMap();
   }
   
   void draw() {
     
-    float radius = displaySize / 54;
+    float radius = displaySize / 64; // originally was displaySize / 54
     float delta = 2 * radius * sin(PI / 3);
     
     pushMatrix();
@@ -67,6 +70,29 @@ class Panel {
     }
     
     popMatrix();
+    
+  }
+  
+  void loadVideoMap() {
+    float radius = videoSize / 64;
+    float delta = 2 * radius * sin(PI / 3);
+    float[] xy = panelCenterForVideoMap(index);
+    
+    float rotateAngle = PI / 6;
+    
+    xy = rotateTranslate(xy[0], xy[1], rotateAngle, -4 * radius, -4 * delta);
+    
+    for (int row = 0; row < 9; row++) {
+      float[] rowXY = new float[] {xy[0], xy[1]};
+      for (int n = rowStarts[row]; n < rowEnds[row] + 1; n++) {
+        videoMap[n][0] = rowXY[0];
+        videoMap[n][1] = rowXY[1];
+        
+        rowXY = rotateTranslate(rowXY[0], rowXY[1], rotateAngle, 2 * radius, 0);
+      }
+      int dir = (row < 4) ? -1 : 1;
+      xy = rotateTranslate(xy[0], xy[1], rotateAngle, dir * radius, delta);
+    }
     
   }
 
