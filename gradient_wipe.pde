@@ -10,7 +10,7 @@ public class GradientWipe extends Mode {
   float xOff = 0.0;
   float yOff = 0.0;
   
-  int wipeTypeChance = 4;
+  int wipeTypeChance = 128;
   int typesOfWipe = 6;
   int wipeType = 5;
   

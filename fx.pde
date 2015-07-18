@@ -44,7 +44,8 @@ int[] fx(int r, int g, int b, int t) {
     // FRAN, GEO, HANA, IAGO, JOAN, KARL, LILA
   }
   
-  return new int[] {(int) newR, (int) newG, (int) newB};
+  int[] c = new int[] {(int) newR, (int) newG, (int) newB}; 
+  return field.wheel.applyBrightness(c, globalBrightness);
 }
 
 void randomizeFX() {

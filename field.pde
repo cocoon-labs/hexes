@@ -6,9 +6,10 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  int nModes = 13;
+  int nModes = 14;
   Mode[] modes = new Mode[nModes];
-  int mode = 11;
+  int mode = 12;
+  int gwModeNum = nModes - 1;
   OPC opc;
   
   Field(int chanceFactor, int modeChance, OPC opc) {
@@ -35,7 +36,8 @@ class Field {
     modes[9] = new Snake(panels, wheel, 0.50, chance);
     modes[10] = new StarTrek(panels, wheel, 1.1, chance);
     modes[11] = new Spiral(panels, wheel, 0.50, chance);
-    modes[12] = new GradientWipe(panels, wheel, 0.9, 1.07, chance);
+    modes[12] = new PlayMov(panels, wheel, 0.99, chance);
+    modes[13] = new GradientWipe(panels, wheel, 0.9, 1.17, chance); // was 1.07
   }
   
   void draw() {
@@ -58,7 +60,11 @@ class Field {
   
   public void randomize() {
     if (rand.nextInt(modeChance) == 0 && modeSwitching) {
-      setMode(rand.nextInt(nModes));
+      int newMode = 12;
+      while (newMode == 12) {
+        newMode = rand.nextInt(nModes);
+      }
+      setMode(newMode);
     }
   }
   
@@ -111,12 +117,12 @@ class Field {
   }
 
   public int totalModes() {
-    return nModes + ((GradientWipe) modes[12]).typesOfWipe - 1;
+    return nModes + ((GradientWipe) modes[gwModeNum]).typesOfWipe - 1;
   }
 
   public int trueMode() {
     int result = mode;
-    if (result == 12)
+    if (result == gwModeNum)
       result += ((GradientWipe) modes[mode]).wipeType;
 
     return result;
