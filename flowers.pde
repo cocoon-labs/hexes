@@ -30,19 +30,14 @@ public class Flowers extends Mode {
     int[] c;
     for (int i = 0; i < nPanels; i++) {
       for (int j = 0; j < triangleN - 3; j += skipper) {
-        c = wheel.getColor(j * objStep, constrain(getPanelBand(i) * ampFactor, 0, 255));
+        c = wheel.getColor(j * (int) map(interloopWSF, 0, 5, 8, 16),
+                           constrain(getPanelBand(i) * ampFactor, 0, 255));
         for (int k = 0; k < nTriangles; k++) {
           if (Arrays.equals(panels[i].getOneByTriangleIndex(k, j), black)) {
             updateTriangleByIndex(c, i, k, j);
           }
         }
       }
-    }
-    if (rand.nextInt(chance) == 0) {
-      // brghtness = initBright;
-      // println("resetting", brghtness);
-      // selector = rand.nextInt(nModes);
-      // skipper = rand.nextInt(maxSkip) + 1;
     }
     rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
     wheel.turn((int) intraloopWSF);
@@ -53,17 +48,17 @@ public class Flowers extends Mode {
     for (int i = 0; i < nPanels; i+= skipper) {
       if (rand.nextInt((int) map(fubar, 0, 1, 1, 64)) == 0) {
         for (int j = 0; j < nRings; j += constrain(skipper, 2, maxSkip + 1)) {
-          c = wheel.getColor(j * objStep, constrain(getPanelBand(i) * ampFactor, 0, 255));
-          // if (Arrays.equals(panels[i].getOneByRingIndex(j, 0), black))
+          c = wheel.getColor(j * (int) map(interloopWSF, 0, 5, 8, 16),
+                             constrain(getPanelBand(i) * ampFactor, 0, 255));
           updateRing(c, j);
         }
       }
       if (rand.nextInt((int) map(fubar, 0, 1, 1, 32)) == 0) {
         for (int j = 0; j < 7; j += skipper) {
-          // c = wheel.getColor(j * objStep, brghtness);
           for (int k = 0; k < 7; k += skipper) {
             if (Arrays.equals(panels[i].getOneByHex(j, 6), black)) {
-              c = wheel.getColor(k * objStep, constrain(getPanelBand(i) * ampFactor, 0, 255));
+              c = wheel.getColor(k * (int) map(interloopWSF, 0, 5, 8, 16),
+                                 constrain(getPanelBand(i) * ampFactor, 0, 255));
               panels[i].updateOneByHex(c, j, k);
             } else rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
           }
@@ -82,12 +77,9 @@ public class Flowers extends Mode {
     return (int) (weightedLowBand + weightedHighBand);
   }
 
-
   public void randomize() {
     super.randomize();
     if (rand.nextInt(chance / 4) == 0) {
-      // brghtness = initBright;
-      // skipper = rand.nextInt(maxSkip) + 1;
       rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
     }
   }

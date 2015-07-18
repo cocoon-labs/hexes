@@ -91,7 +91,7 @@ public class Vertigo extends Mode {
   void drawRings() {
     for (int i = 0; i < nPanels; i++) {
       for (int r = 0; r < 4; r++) {
-        updateByRingIndex(wheel.getColor((int) (intraloopWSF * panelOffset) * i + (int) (r * ringOffset * intraloopWSF), 255), i, r + 1, ringIndex[i][r]);
+        updateByRingIndex(wheel.getColor((int) (intraloopWSF * panelOffset) * i + (int) (r * ringOffset * midWSF), 255), i, r + 1, ringIndex[i][r]);
       }
     }
   }

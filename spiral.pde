@@ -29,6 +29,7 @@ public class Spiral extends Mode {
   }
 
   public void onBeat() {
+    minSpirals = (int) map(fubar, 0, 1, 1, 10);
     wheel.turn((int) (beatOffset * interloopWSF));
     if (numSpirals < minSpirals) newSpiral(numSpirals - minSpirals);
   }
@@ -67,6 +68,7 @@ public class Spiral extends Mode {
   }
   
   void newSpiral(int n) {
+    maxSpirals = (int) map(fubar, 0, 1, 30, 50);
     for (int i = 0; i < n; i++) {
       if (numSpirals < maxSpirals) {
         indexHigh[numSpirals] = rand.nextInt(nPixels);

@@ -25,8 +25,9 @@ public class Snake extends Mode {
   }
   
   public void onBeat() {
+    int tmp = (int) map(fubar, 0, 1, 20, 40);
     wheel.turn((int) (beatOffset * interloopWSF));
-    if (numSnakes < minSnakes) newSnake(numSnakes - minSnakes);
+    if (numSnakes < tmp) newSnake(numSnakes - tmp);
   }
   
   public void randomize() {
@@ -62,7 +63,7 @@ public class Snake extends Mode {
   
   void newSnake(int n) {
     for (int i = 0; i < n; i++) {
-      if (numSnakes < maxSnakes) {
+      if (numSnakes < (int) map(fubar, 0, 1, 40, 60)) {
         snakePos[numSnakes] = rand.nextInt(nPixels);
         numSnakes++;
       }
@@ -82,7 +83,7 @@ public class Snake extends Mode {
   }
   
   void killSnake() {
-    if (numSnakes > minSnakes) {
+    if (numSnakes > (int) map(fubar, 0, 1, 20, 40)) {
       for (int i = 0; i < numSnakes - 1; i++) {
         snakePos[i] = snakePos[i + 1];
       }
