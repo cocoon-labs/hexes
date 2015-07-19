@@ -5,9 +5,9 @@ import ddf.minim.analysis.*;
 import ddf.minim.*;
 import oscP5.*;
 import netP5.*;
-import gifAnimation.*;
+// import gifAnimation.*;
 
-PImage[] gif;
+// PImage[] gif;
 Random rand = new Random(); 
 
 int displaySize = 1000;
@@ -53,7 +53,7 @@ void setup() {
   
   size(displaySize, displaySize);
   background(0);
-  gif = Gif.getPImages(this, "qc.gif");
+  // gif = Gif.getPImages(this, "qc.gif");
   
   minim = new Minim(this);
   

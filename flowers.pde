@@ -46,14 +46,14 @@ public class Flowers extends Mode {
   public void onBeat() {
     int[] c;
     for (int i = 0; i < nPanels; i+= skipper) {
-      if (rand.nextInt((int) map(fubar, 0, 1, 1, 64)) == 0) {
+      if (rand.nextInt((int) map(fubar, 0, 1, 5, 64)) == 0) {
         for (int j = 0; j < nRings; j += constrain(skipper, 2, maxSkip + 1)) {
           c = wheel.getColor(j * (int) map(interloopWSF, 0, 5, 8, 16),
                              constrain(getPanelBand(i) * ampFactor, 0, 255));
           updateRing(c, j);
         }
       }
-      if (rand.nextInt((int) map(fubar, 0, 1, 1, 32)) == 0) {
+      if (rand.nextInt((int) map(fubar, 0, 1, 5, 32)) == 0) {
         for (int j = 0; j < 7; j += skipper) {
           for (int k = 0; k < 7; k += skipper) {
             if (Arrays.equals(panels[i].getOneByHex(j, 6), black)) {

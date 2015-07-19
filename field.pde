@@ -6,7 +6,7 @@ class Field {
   //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  int nModes = 14;
+  int nModes = 13;
   Mode[] modes = new Mode[nModes];
   int mode = 12;
   int gwModeNum = nModes - 1;
@@ -36,8 +36,7 @@ class Field {
     modes[9] = new Snake(panels, wheel, 0.50, chance);
     modes[10] = new StarTrek(panels, wheel, 1.1, chance);
     modes[11] = new Spiral(panels, wheel, 0.50, chance);
-    modes[12] = new PlayMov(panels, wheel, 0.99, chance);
-    modes[13] = new GradientWipe(panels, wheel, 0.9, 1.17, chance); // was 1.07
+    modes[12] = new GradientWipe(panels, wheel, 0.9, 1.17, chance); // was 1.07
   }
   
   void draw() {
@@ -60,10 +59,7 @@ class Field {
   
   public void randomize() {
     if (rand.nextInt(modeChance) == 0 && modeSwitching) {
-      int newMode = 12;
-      while (newMode == 12) {
-        newMode = rand.nextInt(nModes);
-      }
+      int newMode = rand.nextInt(nModes);
       setMode(newMode);
     }
   }
