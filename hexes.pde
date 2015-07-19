@@ -26,7 +26,7 @@ AudioPlayer sound;
 AudioInput in;
 int bufferSize = 1024;
 float sampleRate = 44100;
-String song = "ohl.mp3";
+String song = "dlp.mp3";
 
 // remote stuff
 int globalBrightness = 255;
@@ -58,31 +58,31 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  //in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  //bpm = new BPMDetector(in);
+  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  bpm = new BPMDetector(in);
   
   // MP3 in
-  sound = minim.loadFile(song);
-  bpm = new BPMDetector(sound);
+  // sound = minim.loadFile(song);
+  // bpm = new BPMDetector(sound);
   
   bpm.setup();
   
   //drawHexes();
 
-  opc = new OPC(this, "127.0.0.1", 7890);
+  opc = new OPC(this, "192.168.2.233", 7890);
   field = new Field(500, 320, opc);
   
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.2.149", myListeningPort);
+  myRemoteLocation = new NetAddress("192.168.2.233", myListeningPort);
 }
 
 void draw() {
   field.randomize();
   field.update();
-  field.draw();
-  //field.send();
+  //field.draw();
+  field.send();
 }
 
 void keyPressed() {
@@ -105,7 +105,7 @@ void oscEvent(OscMessage theOscMessage)
   int a0, a1;
   
   if (addPatt.length() < 3) {
-    //println("Page change");
+    println("Page change");
   } else if (patLen == 9 && addPatt.substring(0, 5).equals("/mode")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
       a0 = 5 - Integer.parseInt(addPatt.substring(6, 7));
