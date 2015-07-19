@@ -2,8 +2,8 @@ public class PlayMov extends Mode {
   
   int[] pixelBands = new int[nPixels];
   int[] panelBands = new int[nPanels];
-  int nImages = 6;
-  int iImage = 3;
+  int nImages = 7;
+  int iImage = 6;
   PImage[] frames = new PImage[nImages];
   int gifCount;
   int pixelOffset = 1;
@@ -25,6 +25,7 @@ public class PlayMov extends Mode {
     frames[3] = loadImage("eye.jpg");
     frames[4] = loadImage("lotus.jpg");
     frames[5] = loadImage("rainbowSmoke.jpg");
+    frames[6] = loadImage("hearts.jpg");
     
     gifCount = 0;
     
@@ -36,7 +37,7 @@ public class PlayMov extends Mode {
     
     wheel.turn((int) (pixelOffset * intraloopWSF));
     
-    rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
+    if (midWSF < 4) rotateSmallHexes(rand.nextInt(2) == 0 ? false : true);
   }
 
   public void onBeat() {
@@ -48,7 +49,7 @@ public class PlayMov extends Mode {
     } else {
       drawFrame(frames[iImage]);
     }
-    shift(shiftDir);
+    if (midWSF < 4) shift(shiftDir);
   }
   
   public void randomize() {
@@ -71,6 +72,10 @@ public class PlayMov extends Mode {
     if (rand.nextInt(highChance * 2) == 0) {
       iImage = rand.nextInt(nImages);
     }
+    if (rand.nextInt(highChance * 2) == 0) {
+      iImage = 6;
+    }
+    
   }
   
   private void assignBands() {

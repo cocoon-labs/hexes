@@ -7,11 +7,10 @@ import oscP5.*;
 import netP5.*;
 import gifAnimation.*;
 
-
 PImage[] gif;
 Random rand = new Random(); 
 
-int displaySize = 2000;
+int displaySize = 1000;
 Field field;
 OPC opc;
 
@@ -59,12 +58,12 @@ void setup() {
   minim = new Minim(this);
   
   // Line in
-  in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
-  bpm = new BPMDetector(in);
+  //in = minim.getLineIn(Minim.MONO, bufferSize, sampleRate);
+  //bpm = new BPMDetector(in);
   
   // MP3 in
-//  sound = minim.loadFile(song);
-//  bpm = new BPMDetector(sound);
+  sound = minim.loadFile(song);
+  bpm = new BPMDetector(sound);
   
   bpm.setup();
   
