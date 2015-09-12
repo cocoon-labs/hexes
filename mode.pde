@@ -11,6 +11,7 @@ class Mode {
   int prevTime;
   boolean justEntered = false;
   boolean delayable = false;
+  int minDelay = 0;
   int shiftStyle = 0;
   int nShiftStyles = 3;
   boolean shiftDir = true;
@@ -30,14 +31,14 @@ class Mode {
     int time = millis();
     if (!delayable) {
       update();
-    } else if (delay == 0 || (time - prevTime) > delay) {
+    } else if (delay() == 0 || (time - prevTime) > delay()) {
       update();
       prevTime = time;
     }
   }
 
   public void update() {
-    if (bpm.isBeat()) {
+    if (bpm.isBeat() || (!soundReactive && rand.nextInt(100) == 0)) {
       onBeat();
       randomize();
     }
@@ -261,6 +262,9 @@ class Mode {
     }
   }
   
+  public void advanceType() {
+  }
+  
   int randomNeighbor(int index) {
     int panel = index / 61;
     int indexOnPanel = index % 61;
@@ -314,5 +318,8 @@ class Mode {
   int pixelsInRow(int row) {
     return 1 + rowEnds[row] - rowStarts[row];
   }
-  
+
+  int delay() {
+    return delay + minDelay;
+  }
 }

@@ -27,6 +27,7 @@ AudioInput in;
 int bufferSize = 1024;
 float sampleRate = 44100;
 String song = "dlp.mp3";
+boolean soundReactive = false;
 
 // remote stuff
 int globalBrightness = 255;
@@ -69,20 +70,20 @@ void setup() {
   
   //drawHexes();
 
-  opc = new OPC(this, "192.168.2.233", 7890);
+  opc = new OPC(this, "192.168.2.3", 7890);
   field = new Field(500, 320, opc);
   
   oscP5 = new OscP5(this, myListeningPort);
  
   // set the remote location to be the localhost on port 5001
-  myRemoteLocation = new NetAddress("192.168.2.233", myListeningPort);
+  myRemoteLocation = new NetAddress("127.0.0.1", myListeningPort);
 }
 
 void draw() {
   field.randomize();
   field.update();
-  //field.draw();
-  field.send();
+  field.draw();
+  // field.send();
 }
 
 void keyPressed() {
@@ -110,13 +111,7 @@ void oscEvent(OscMessage theOscMessage)
     if (theOscMessage.get(0).floatValue() == 1.0) {
       a0 = 5 - Integer.parseInt(addPatt.substring(6, 7));
       a1 = Integer.parseInt(addPatt.substring(8, 9)) - 1;
-      field.setMode((5 * a0 + a1) % field.totalModes());
-      // if (index < 12) {
-      //   field.setMode(index);
-      // } else {
-      //   ((GradientWipe) field.modes[12]).wipeType = index - 12;
-      //   field.setMode(12);
-      // }
+      field.setMode((5 * a0 + a1) % field.nModes);
     }
   } else if (patLen == 11 && addPatt.substring(0, 7).equals("/fxMode")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
@@ -204,24 +199,21 @@ void oscEvent(OscMessage theOscMessage)
     fxTime = (int) theOscMessage.get(0).floatValue();
   } else if (addPatt.equals("/coeff")) {
     coeff = theOscMessage.get(0).floatValue();
-  } else if (addPatt.equals("/house")) {
+  } else if (addPatt.equals("/next")) {
     if (theOscMessage.get(0).floatValue() == 1.0) {
-      
-      field.setVibeWhite();
-      globalBrightness = 255;
-      modeSwitching = false;
-      houseLightsOn = true;
-    } else {
-      field.setRainbow();
-      field.newScheme();
-      houseLightsOn = false;
+      field.nextType();
+    }
+  } else if (addPatt.equals("/soundReactive")) {
+    if (theOscMessage.get(0).floatValue() == 1.0) {
+      soundReactive = true;
+    } else { 
+      soundReactive = false;
     }
   } else {
     print("Unexpected OSC Message Recieved: ");
     println("address pattern: " + theOscMessage.addrPattern());
     println("type tag: " + theOscMessage.typetag());
   }
-  
   oscSync();
 }
 
@@ -229,7 +221,7 @@ void oscSync()
 {
   OscMessage message;
   
-  message = new OscMessage("/mode/" + str(5 - field.trueMode() / 5) + "/" + str(field.trueMode() % 5 + 1));
+  message = new OscMessage("/mode/" + str(5 - field.mode / 5) + "/" + str(field.mode % 5 + 1));
   message.add(1.0);
   oscP5.send(message, myNetAddressList);
   
@@ -240,9 +232,9 @@ void oscSync()
   message = new OscMessage("/random");
   message.add(modeSwitching ? 1.0 : 0.0);
   oscP5.send(message, myNetAddressList);
-  
-  message = new OscMessage("/house");
-  message.add(houseLightsOn ? 1.0 : 0.0);
+
+  message = new OscMessage("/soundReactive");
+  message.add(soundReactive ? 1.0 : 0.0);
   oscP5.send(message, myNetAddressList);
   
   message = new OscMessage("/fxOn");

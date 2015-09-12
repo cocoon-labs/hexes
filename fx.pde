@@ -5,8 +5,8 @@ int fxTime = 1;
 float dryWet = .1;
 float coeff = 1;
 
-int numFX = 5;
-int fxMode = 4;
+int numFX = 6;
+int fxMode = 5;
 
 int[] fx(int r, int g, int b, int t) {
   float newR = r;
@@ -38,6 +38,11 @@ int[] fx(int r, int g, int b, int t) {
       newR = sin(r * t) * r;
       newG = sin(g * t) * g;
       newB = sin(b * t) * b;
+      break;
+    case 5: // FRAN
+      newR = abs(sin(r) * r);
+      newG = abs(sin(g) * g);
+      newB = abs(sin(b) * b);
       break;
     default:
       break;

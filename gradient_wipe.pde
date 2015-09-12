@@ -11,8 +11,8 @@ public class GradientWipe extends Mode {
   float yOff = 0.0;
   
   int wipeTypeChance = 128;
-  int typesOfWipe = 6;
-  int wipeType = 5;
+  int typesOfWipe = 7;
+  int wipeType = 6;
   
   GradientWipe(Panel[] panels, ColorWheel wheel, float fadeFactor, float fadeInFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
@@ -117,6 +117,25 @@ public class GradientWipe extends Mode {
         int[] tri2 = iToTriangle2(i);
         c = wheel.getColor((int) (tri2[0] * pixelStep) + tri2[1] * 10, 255); // define target color
         break;
+      case 6: // BY TRIANGLE 3
+        int[] tri3 = iToTriangle0(i);
+        int step = 0;
+        pixelStep = 10;
+        for (int j = 0; j < nPanels; j++) {
+          if (tri3[1] > 3 && tri3[1] < 9) {
+            step = 0;
+          } else if (tri3[1] == 3 || tri3[1] == 13 || tri3[1] == 14 || tri3[1] == 9) {
+            step = 3;
+          } else if (tri3[1] == 2 || tri3[1] == 12 || tri3[1] == 10) {
+            step = 6;
+          } else if (tri3[1] == 11 || tri3[1] == 1) {
+            step = 9;
+          } else {
+            step = 12;
+          }
+        }
+        c = wheel.getColor((int) (tri3[0] * pixelStep) + step * 10, 255);
+        break;
       default:
         c = wheel.getColor(0, 255);
         break;
@@ -138,5 +157,9 @@ public class GradientWipe extends Mode {
         panels[i / 61].brightVals[i % 61] = pixelAmp;
       }
     }
+  }
+
+  public void advanceType() {
+    wipeType = (wipeType + 1) % typesOfWipe;
   }
 }

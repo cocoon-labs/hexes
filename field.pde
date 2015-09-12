@@ -3,14 +3,16 @@ class Field {
   Panel[] panels;
   ColorWheel wheel;
   int nPanels, chance;
-  //int modeChance = 5000;
   int modeChance;
   float faderModeChance = 0.02;
-  int nModes = 13;
+  int nModes = 14;
   Mode[] modes = new Mode[nModes];
   int mode = 12;
   int gwModeNum = nModes - 1;
   OPC opc;
+
+  int GRAD_IDX = 12;
+  int TRIG_IDX = 13;
   
   Field(int chanceFactor, int modeChance, OPC opc) {
     
@@ -31,12 +33,13 @@ class Field {
     modes[4] = new Hypnotize(panels, wheel, 0.98, chance);
     modes[5] = new Ninja(panels, wheel, 0.93, chance);
     modes[6] = new Vertigo(panels, wheel, 0.70, chance);
-    modes[7] = new Flowers(panels, wheel, 0.97, chance);
+    modes[7] = new Flowers(panels, wheel, 0.85, chance);
     modes[8] = new Paraguay(panels, wheel, 0.99, chance);
     modes[9] = new Snake(panels, wheel, 0.50, chance);
     modes[10] = new StarTrek(panels, wheel, 1.1, chance);
     modes[11] = new Spiral(panels, wheel, 0.50, chance);
     modes[12] = new GradientWipe(panels, wheel, 0.9, 1.17, chance); // was 1.07
+    modes[13] = new TrigGradient(panels, wheel, 0.99, chance);
   }
   
   void draw() {
@@ -50,7 +53,7 @@ class Field {
   void send() {
     for (int i = 0; i < nPanels; i++) {
       panels[i].ship(i * panels[0].nPixels);
-  }
+    }
   }
   
   public void update() {
@@ -85,14 +88,12 @@ class Field {
   }
   
   public void setMode(int m) {
-    int maxIdx = nModes - 1;
-    if (m < maxIdx) {
-      mode = m;
-    } else {
-      mode = maxIdx;
-      ((GradientWipe) modes[maxIdx]).wipeType = m - mode;
-    }
+    mode = m;
     modes[mode].justEntered = true;
+    if (!soundReactive && mode < 4 || mode == 8) {
+      mode = rand.nextInt(2) + 12;
+    }
+    oscSync();
   }
   
   public void adjustDelay(int step) {
@@ -112,19 +113,8 @@ class Field {
     return faderModeChance;
   }
 
-  public int totalModes() {
-    return nModes + ((GradientWipe) modes[gwModeNum]).typesOfWipe - 1;
+  public void nextType() {
+    modes[mode].advanceType();
   }
-
-  public int trueMode() {
-    int result = mode;
-    if (result == gwModeNum)
-      result += ((GradientWipe) modes[mode]).wipeType;
-
-    return result;
-  }
-    
-
-
   
 }

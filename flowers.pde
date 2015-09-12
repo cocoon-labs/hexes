@@ -11,15 +11,22 @@ public class Flowers extends Mode {
   int brghtDir = 5;
   int freqThresh = 80;
   int ampFactor = 30;
+  int[] fakeBands;
+  int maxFakeAmp = 128;
 
   Flowers(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
     delayable = true;
+    fakeBands = new int[nPanels];
+    minDelay = 50;
   }
 
   public void update() {
     fadeAll(fadeFactor);
     super.update();
+    for (int i = 0; i < nPanels; i++) {
+      fakeBands[i] = rand.nextInt(maxFakeAmp);
+    }
     if (brghtness == initBright) {
       brghtDir = 5;
     } else if (brghtness == 255) {
@@ -44,6 +51,7 @@ public class Flowers extends Mode {
   }
 
   public void onBeat() {
+    println("is beat");
     int[] c;
     for (int i = 0; i < nPanels; i+= skipper) {
       if (rand.nextInt((int) map(fubar, 0, 1, 5, 64)) == 0) {
@@ -68,13 +76,21 @@ public class Flowers extends Mode {
   }
 
   public int getPanelBand(int pIndex) {
-    float indexMap = map(pIndex, 0, 6 * nPanels - 1, 0, 29);
-    int lowBandIndex = (int) indexMap;
-    float decimal = indexMap - lowBandIndex;
-    if (decimal == 0.0) return (int) bpm.getDetailBand(lowBandIndex);
-    float weightedLowBand = (1.0 - decimal) * bpm.getDetailBand(lowBandIndex);
-    float weightedHighBand = decimal * bpm.getDetailBand(lowBandIndex + 1);
-    return (int) (weightedLowBand + weightedHighBand);
+    int result = 0;
+    if (soundReactive) {
+      float indexMap = map(pIndex, 0, 6 * nPanels - 1, 0, 29);
+      int lowBandIndex = (int) indexMap;
+      float decimal = indexMap - lowBandIndex;
+      if (decimal == 0.0) return (int) bpm.getDetailBand(lowBandIndex);
+      float weightedLowBand = (1.0 - decimal) * bpm.getDetailBand(lowBandIndex);
+      float weightedHighBand = decimal * bpm.getDetailBand(lowBandIndex + 1);
+      result = (int) (weightedLowBand + weightedHighBand);
+    } else {
+      result = fakeBands[pIndex];
+      result += rand.nextInt(8) * (rand.nextInt(2) == 1 ? -1 : 1);
+      result = constrain(result - 64, 0, 255);
+    }
+    return result;
   }
 
   public void randomize() {
