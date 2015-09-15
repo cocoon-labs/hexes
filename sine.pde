@@ -28,6 +28,9 @@ public class TrigGradient extends Mode {
         float sinFactor = calculateSinFactor(xy, t0 + i * panelTOff);
         c = wheel.getColor((int) (intraloopWSF * abs(sinFactor) * j + i * panelOff),
                            (int) map(sinFactor, -trigCoeff, trigCoeff, 64, 255));
+        for (int k = 0; k < c.length; k++) {
+          c[k] = constrain(c[k], 0, 255);
+        }
         panels[i].updateOne(c, j);
       }
     }
