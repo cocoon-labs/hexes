@@ -1,6 +1,5 @@
 public class Ninja extends Mode {
 
-  int expansionFactor = 0;
   int inc = -1;
   int index = 0;
   int direction = 1;
@@ -11,7 +10,7 @@ public class Ninja extends Mode {
   Ninja(Panel[] panels, ColorWheel wheel, float fadeFactor, int chance) {
     super(panels, wheel, fadeFactor, chance);
     delayable = true;
-    minDelay = 23;
+    minDelay = 50;
   }
   
   public void update() {
@@ -19,15 +18,13 @@ public class Ninja extends Mode {
     super.update();
     int centerRow = 4;
     int centerCol = 4;
-    int[] white = {255, 255, 255};
-    int[] black = {0, 0, 0};
 
     for (int i = 0; i < nPanels; i++) {
       drawFlower(i, centerRow, centerCol);
       if (soundReactive) {
         updateFFT(i);
       } else {
-        innerGradient();
+        innerGradient(i);
       }
     }
 
@@ -72,7 +69,13 @@ public class Ninja extends Mode {
     }
   }
 
-  public void innerGradient() {
+  public void innerGradient(int pIdx) {
+    for (int i = 0; i < 6; i++) {
+      int[] c = wheel.getColor((int) (pIdx * 4 * intraloopWSF) + i * 32, 255);
+      if (rand.nextInt(50) == 0) {
+        updateOneInnerTriangle(c, pIdx, i);
+      }
+    }
   }
 
   public int getTriangleBand(int triIndex) {
